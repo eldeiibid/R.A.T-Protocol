@@ -12,7 +12,7 @@ R.A.T. Protocol es un videojuego en 2D de vista cenital para dos jugadores en re
 | Nombre y apellidos | Correo URJC | GitHub |
 | :--- | :--- | :--- |
 | Alejandro Cuaxiloa del Campo| a.cuaxiloa.2024@alumnos.urjc.es | `@jakmankes` |
-| Javier Borriño Carnerero | j.borrino.2024@alumnos.urjc.es | `@` |
+| Javier Borriño Carnerero | j.borrino.2024@alumnos.urjc.es | `@Er-Jota` |
 | David Benítez Vázquez | d.benitezv.2024@alumnos.urjc.es | `@eldeiibid` |
 | Daniel Borges Cano | d.borges.2024@alumnos.urjc.es | `@jaroithink` |
 
@@ -45,3 +45,7 @@ Apartados principales:
 | Fase 2 | Juego en local | ⏳ Pendiente |
 | Fase 3 | API REST | ⏳ Pendiente |
 | Fase 4 | WebSockets | ⏳ Pendiente |
+
+---
+
+[Presentación](https://docs.google.com/presentation/d/1MwmwgLwlIVrX6K134yq0h7a6wDkHj4Yc4Tm2GUIP_VM/edit?slide=id.g3f4ba82a827_0_114#slide=id.g3f4ba82a827_0_114)
