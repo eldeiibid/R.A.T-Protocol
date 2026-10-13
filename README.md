@@ -28,14 +28,12 @@ R.A.T. Protocol es un videojuego en 2D de vista cenital para dos jugadores en re
 
 Apartados principales:
 
-- [Especificaciones básicas](GDD.md#2-especificaciones-básicas)
-- [Jugabilidad](GDD.md#3-jugabilidad)
-- [Narrativa](GDD.md#4-narrativa)
-- [Imagen y diseño visual](GDD.md#5-imagen-y-diseño-visual)
-- [Sonido](GDD.md#6-sonido)
-- [Interfaz y diagrama de flujo](GDD.md#7-interfaz-y-diagrama-de-flujo)
-- [Comunicación y marketing](GDD.md#8-comunicación-y-marketing)
-- [Referencias](GDD.md#9-referencias)
+- [Introducción](GDD.md#1.-introducción.)
+- [Jugabilidad](GDD.md#2.-jugabilidad.)
+- [Diagrama de flujo](GDD.md#2.4.-estados-del-juego-y-diagrama-de-flujo)
+- [Historia y lore](GDD.md#3.-historia.)
+- [Apartado artistico](GDD.md#4.-arte,-concept-art-y-sonido.)
+- [Apartado sonoro](GDD.md#4.2.-música.)
 
 ---
 
