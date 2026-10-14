@@ -5,7 +5,7 @@
 
 ## Descripción de la temática
 
-R.A.T. Protocol es un videojuego en 2D de vista cenital para dos jugadores en red donde forman parte de un equipo de exterminación especial. Con enfoque cooperativo y horde shooter pero desde una vista cenital, R.A.T. protocol es un juego de acción en ambientes de estetica "Diesel-punk", los jugadores, controlando personajes bien armados, tienen la misión de adentrarse en las profundidades de una megafabrica para aniquilar la horda interminable de mutantes rata-hombres
+R.A.T. Protocol es un videojuego en 2D de vista cenital para dos jugadores en red donde forman parte de un equipo de exterminación especial. Con enfoque cooperativo y horde shooter pero desde una vista cenital, R.A.T. protocol es un juego de acción en ambientes de estética "Diesel-punk", los jugadores, controlando personajes bien armados, tienen la misión de adentrarse en las profundidades de una mega fábrica para aniquilar la horda interminable de mutantes rata-hombres.
 
 ## Equipo de desarrollo
 
@@ -32,7 +32,7 @@ Apartados principales:
 - [Jugabilidad](GDD.md#2.-jugabilidad.)
 - [Diagrama de flujo](GDD.md#2.4.-estados-del-juego-y-diagrama-de-flujo)
 - [Historia y lore](GDD.md#3.-historia.)
-- [Apartado artistico](GDD.md#4.-arte,-concept-art-y-sonido.)
+- [Apartado artístico](GDD.md#4.-arte,-concept-art-y-sonido.)
 - [Apartado sonoro](GDD.md#4.2.-música.)
 
 ---
@@ -48,4 +48,4 @@ Apartados principales:
 
 ---
 
-[Presentación](https://docs.google.com/presentation/d/1MwmwgLwlIVrX6K134yq0h7a6wDkHj4Yc4Tm2GUIP_VM/edit?slide=id.g3f4ba82a827_0_114#slide=id.g3f4ba82a827_0_114)
+[Presentación](https://docs.google.com/presentation/d/1MwmwgLwlIVrX6K134yq0h7a6wDkHj4Yc4Tm2GUIP_VM/edit?usp=sharing)
