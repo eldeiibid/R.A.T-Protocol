@@ -49,23 +49,18 @@ export class GameScene extends Phaser.Scene {
         this.scoreRight = this.add.text(600, 50, '0', { fontSize: '48px' }).setOrigin(0.5);
 
         // Collisions on all sides 
-        this.physics.world.setBoundsCollision(false, false, true, true);
+        this.physics.world.setBoundsCollision(true, true, true, true);
 
         // Create the box
         this.createBall();
 
         // Launch the ball
-        this.resetBall();
+        //this.resetBall();
 
         // Setup players
         this.setUpPlayers();
 
-        // Setup collisions
-        this.players.forEach(paddle => {
-            this.physics.add.collider(this.ball, paddle.sprite, () => {
-                this.sound.play('hit');
-            });
-        });
+        // Setup collisions [Añadir]
 
         // Pause with ESC and show the pause menu on top
         this.input.keyboard.on('keydown-ESC', () => {
@@ -81,14 +76,18 @@ export class GameScene extends Phaser.Scene {
         this.players.set(player1.id, player1);
         this.players.set(player2.id, player2);
 
+
+        //KEY MAPPING
         const Keys = Phaser.Input.Keyboard.KeyCodes;
         this.inputMappings = [
-            {paddle: player1, up: Keys.W, down: Keys.S},
-            {paddle: player2, up: Keys.UP, down: Keys.DOWN}
+            {paddle: player1, up: Keys.W, down: Keys.S, left: Keys.A, right: Keys.D},
+            {paddle: player2, up: Keys.UP, down: Keys.DOWN, left: Keys.LEFT, right: Keys.RIGHT}
         ].map(mapping => ({
             paddle: mapping.paddle,
             upKey: this.input.keyboard.addKey(mapping.up),
-            downKey: this.input.keyboard.addKey(mapping.down)
+            downKey: this.input.keyboard.addKey(mapping.down),
+            leftKey: this.input.keyboard.addKey(mapping.left),
+            rightKey: this.input.keyboard.addKey(mapping.right)
         }));
     }
     
@@ -157,22 +156,20 @@ export class GameScene extends Phaser.Scene {
         this.inputMappings.forEach(mapping => {
             const paddle = mapping.paddle;
 
+            //Moving logic
             if (mapping.upKey.isDown) {
                 paddle.sprite.setVelocityY(-paddle.speed);
             } else if (mapping.downKey.isDown) {
                 paddle.sprite.setVelocityY(paddle.speed);
+            } else if (mapping.leftKey.isDown){
+                paddle.sprite.setVelocityX(-paddle.speed);
+            } else if (mapping.rightKey.isDown){
+                paddle.sprite.setVelocityX(paddle.speed);
             } else {
+                paddle.sprite.setVelocityX(0);
                 paddle.sprite.setVelocityY(0);
             }
-        });
 
-        // Game loop
-        if (this.ball.x < 0) {
-            this.rightGoals += 1;
-            this.goal();
-        } else if (this.ball.x > 800) {
-            this.leftGoals += 1;
-            this.goal();
-        }
+        });
     }
 }

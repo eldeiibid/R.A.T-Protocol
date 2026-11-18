@@ -6,7 +6,7 @@ export class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(400, 150, 'PONG', {
+        this.add.text(400, 150, 'R.A.T Protocol', {
             fontSize: '64px',
             color: '#ffffff'
         }).setOrigin(0.5);
