@@ -60,8 +60,6 @@ export class GameScene extends Phaser.Scene {
         // Setup players
         this.setUpPlayers();
 
-        // Setup collisions [Añadir]
-
         // Pause with ESC and show the pause menu on top
         this.input.keyboard.on('keydown-ESC', () => {
             this.scene.pause();
@@ -75,6 +73,24 @@ export class GameScene extends Phaser.Scene {
 
         this.players.set(player1.id, player1);
         this.players.set(player2.id, player2);
+
+        //Setup collisions
+        this.physics.add.collider(player1.sprite, player2.sprite);
+        this.physics.add.collider(player2.sprite, player1.sprite);
+
+        // Crear grupo estático de plataformas: Se debería hacer en otra función pero es para probar
+        let plataformas = this.physics.add.staticGroup();
+        // Añadir plataformas
+        plataformas.create(400, 568, 'suelo')
+            .setScale(2)
+            .refreshBody();  // Actualizar tras modificar
+        
+        plataformas.create(600, 400, 'suelo');
+        plataformas.create(50, 250, 'suelo');
+
+        // Colisión con todas
+        this.physics.add.collider(player1.sprite, plataformas);
+        this.physics.add.collider(player2.sprite, plataformas);
 
 
         //KEY MAPPING

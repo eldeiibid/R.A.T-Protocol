@@ -8,7 +8,7 @@ export class Paddle {
 
         this.sprite = scene.physics.add.sprite(x, y, 'paddle');
         this.sprite.setDisplaySize(20, 100);
-        this.sprite.setImmovable(true);
+        this.sprite.setImmovable(false);
         this.sprite.setCollideWorldBounds(true);
     }
 }
