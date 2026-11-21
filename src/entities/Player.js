@@ -11,6 +11,11 @@ export class Player {
         this.scene = scene;
         this.speed = 300;
 
+        this.sprite = scene.physics.add.sprite(x, y, 'player');
+        this.sprite.setDisplaySize(20, 100);
+        this.sprite.setImmovable(false);
+        this.sprite.setCollideWorldBounds(true);
+
         // this.key devuelve la accion que las teclas han registrado,
         // en caso del RangedPlayer UP sera up, pero MeleePlayer W sera up
         this.key = scene.input.keyboard.addKeys({
@@ -61,8 +66,8 @@ export class Player {
     }
     // mueve el sprite y hitbox del jugador para que mire hacia unas coordenadas especificas
     lookAt(x, y){
-        let deltaX = this.sprite.x - x;
-        let deltaY = this.sprite.y - y;
+        let deltaX = x - this.sprite.x;
+        let deltaY = y - this.sprite.y;
 
         let alpha = Math.atan2(deltaY, deltaX);
         this.sprite.rotation = alpha;
@@ -81,6 +86,7 @@ export class Player {
         if(this.health < 0){
             this.health = 0;
         }
+        console.log(this.id + ' ouch: ' + this.health)
     }
     fire(){
 

@@ -1,7 +1,9 @@
 import { Player } from '../entities/Player';
+import { projectileHitBox } from '../nonEntities/hitboxes/projectileHitBox';
 
 export class RangedPlayer extends Player {
     constructor(scene, id, x, y, controls){
+        this.cooldown = 5;
         super(scene, id, controls)
         
         //sprite del jugador
@@ -12,6 +14,9 @@ export class RangedPlayer extends Player {
     }
 
     update(){
+        if (this.cooldown > 0){
+            this.cooldown = this.cooldown - 1;
+        }
         super.move();
         this.handleInput();
         // siempre estara mirando hacia el raton, aqui llamado pointer
@@ -20,7 +25,7 @@ export class RangedPlayer extends Player {
     }
     handleInput(){
         //escucha al mousePointer de la escena (el raton)
-        if (this.scene.input.mousePointer.leftButtonDown()) {
+        if (this.scene.input.mousePointer.leftButtonDown() && this.cooldown === 0) {
         this.fire();
         }
 
@@ -31,7 +36,18 @@ export class RangedPlayer extends Player {
         }
     }
     fire(){
-        
+        this.cooldown = 5;
+        const pointer = this.scene.input.activePointer;
+        const dir = {
+            x: pointer.x - this.sprite.x,
+            y: pointer.y - this.sprite.y
+        };
+
+        new projectileHitBox(
+            this.scene,
+            this,
+            dir
+        );
     }
 
     reload(){
