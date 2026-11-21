@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "phaser": "^3.88.2",
+    "phaser": "^3.90.0",
     "serve": "^14.2.6"
   },
   "devDependencies": {

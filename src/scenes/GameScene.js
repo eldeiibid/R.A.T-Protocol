@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
-import { Paddle } from '../entities/Paddle';
+import { Player } from '../entities/Player';
+import { RangedPlayer } from '../entities/RangedPlayer';
+import { MeleePlayer } from '../entities/MeleePlayer';
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -13,7 +15,7 @@ export class GameScene extends Phaser.Scene {
 
     preload() {
         // Load assets
-        this.load.image('paddle', 'assets/images/paddle.png')
+        this.load.image('player', 'assets/images/paddle.png')
 
         // Hit sound
         this.load.audio('hit', 'assets/audio/hit.mp3');
@@ -36,9 +38,6 @@ export class GameScene extends Phaser.Scene {
             this.music.destroy();
         });
 
-        this.leftGoals = 0;
-        this.rightGoals = 0;
-
         // Add mid line
         for (let i = 0; i < 12; i++) {
             this.add.rectangle(400, i * 50 + 25, 10, 30, 0x666666);
@@ -51,12 +50,6 @@ export class GameScene extends Phaser.Scene {
         // Collisions on all sides 
         this.physics.world.setBoundsCollision(true, true, true, true);
 
-        // Create the box
-        this.createBall();
-
-        // Launch the ball
-        //this.resetBall();
-
         // Setup players
         this.setUpPlayers();
 
@@ -68,15 +61,34 @@ export class GameScene extends Phaser.Scene {
     }
 
     setUpPlayers() {
-        const player1 = new Paddle(this, 'player1', 50, 300);
-        const player2 = new Paddle(this, 'player2', 750, 300);
-
-        this.players.set(player1.id, player1);
-        this.players.set(player2.id, player2);
+        //crea los jugadores como objetos de esta escena, introduce la escena, el id del jugador, su posicion y sus controles        
+        this.player1 = new RangedPlayer(this, 'player1', 50, 300, {
+            up: 'UP',
+            down: 'DOWN',
+            left: 'LEFT',
+            right: 'RIGHT',
+            interact: 'NUMPAD_ZERO',
+            healSelf: 'CTRL',
+            healOther: 'SHIFT'
+        });
+        // el jugador a Melee tiene controles adicionales para sus ataques
+        this.player2 = new MeleePlayer(this, 'player2', 750, 300, {
+            up: 'W',
+            down: 'S',
+            left: 'A',
+            right: 'D',
+            interact: ' ',
+            healSelf: 'Q',
+            healOther: 'F'
+        }, {
+            attackUp: 'Y',
+            attackDown: 'H',
+            attackLeft: 'G',
+            attackRight: 'J'
+        });
 
         //Setup collisions
-        this.physics.add.collider(player1.sprite, player2.sprite);
-        this.physics.add.collider(player2.sprite, player1.sprite);
+        this.physics.add.collider(this.player1.sprite, this.player2.sprite);
 
         // Crear grupo estático de plataformas: Se debería hacer en otra función pero es para probar
         let plataformas = this.physics.add.staticGroup();
@@ -89,103 +101,13 @@ export class GameScene extends Phaser.Scene {
         plataformas.create(50, 250, 'suelo');
 
         // Colisión con todas
-        this.physics.add.collider(player1.sprite, plataformas);
-        this.physics.add.collider(player2.sprite, plataformas);
-
-
-        //KEY MAPPING
-        const Keys = Phaser.Input.Keyboard.KeyCodes;
-        this.inputMappings = [
-            {paddle: player1, up: Keys.W, down: Keys.S, left: Keys.A, right: Keys.D},
-            {paddle: player2, up: Keys.UP, down: Keys.DOWN, left: Keys.LEFT, right: Keys.RIGHT}
-        ].map(mapping => ({
-            paddle: mapping.paddle,
-            upKey: this.input.keyboard.addKey(mapping.up),
-            downKey: this.input.keyboard.addKey(mapping.down),
-            leftKey: this.input.keyboard.addKey(mapping.left),
-            rightKey: this.input.keyboard.addKey(mapping.right)
-        }));
-    }
-    
-    resetBall() {
-        this.ball.setVelocity(0, 0);
-        this.ball.setPosition(400, 300);
-        this.time.delayedCall(2000, () => this.launchBall());
-    }
-
-    launchBall() {
-        const angle = Phaser.Math.Between(-30, 30);
-        const speed = 400;
-        const direction = Math.random() < 0.5 ? 1 : -1;
-
-        const speedX = Math.cos(Phaser.Math.DegToRad(angle)) * speed * direction;
-        const speedY = Math.sin(Phaser.Math.DegToRad(angle)) * speed;
-        this.ball.setVelocity(
-            speedX, speedY
-        );
-    }
-
-    createBall() {
-        const graphics = this.add.graphics();
-        graphics.fillStyle(0xffffff);
-        graphics.fillCircle(8, 8, 8);
-        graphics.generateTexture('ball', 16, 16);
-        graphics.destroy();
-
-        this.ball = this.physics.add.image(400, 300, 'ball').setOrigin(0.5);
-        this.ball.setCollideWorldBounds(true);
-        this.ball.setBounce(1);
-
-    }
-
-    goal() {
-        this.scoreRight.setText(this.rightGoals.toString());
-        this.scoreLeft.setText(this.leftGoals.toString());
-
-        if (this.leftGoals + this.rightGoals >= 3) {
-            const winnerId = this.leftGoals > this.rightGoals ? 'player1' : 'player2';
-            this.endGame(winnerId);
-        } else {
-            this.resetBall();
-        }
-    }
-
-    endGame(winnerId) {
-        this.ball.setVelocity(0, 0);
-        this.ball.setPosition(400, 300);
-        this.ball.setVisible(false);
-        this.players.forEach(paddle => { paddle.sprite.setVelocity(0, 0); });
-        this.physics.pause();
-
-        const winnerText = winnerId === 'player1' ? 'Player 1 Wins!' : 'Player 2 Wins!';
-        this.add.text(400, 250, winnerText, { fontSize: '48px' }).setOrigin(0.5);
-
-        const menuBtn = this.add.text(400, 350, 'Menu', { fontSize: '32px', color: '#00ff00' }).setOrigin(0.5)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerover', () => menuBtn.setStyle({ color: '#ffff00' }))
-            .on('pointerout', () => menuBtn.setStyle({ color: '#00ff00' }))
-            .on('pointerdown', () => this.scene.start('MenuScene'));
+        this.physics.add.collider(this.player1.sprite, plataformas);
+        this.physics.add.collider(this.player2.sprite, plataformas);
     }
 
     update(time, delta) {
-
-        this.inputMappings.forEach(mapping => {
-            const paddle = mapping.paddle;
-
-            //Moving logic
-            if (mapping.upKey.isDown) {
-                paddle.sprite.setVelocityY(-paddle.speed);
-            } else if (mapping.downKey.isDown) {
-                paddle.sprite.setVelocityY(paddle.speed);
-            } else if (mapping.leftKey.isDown){
-                paddle.sprite.setVelocityX(-paddle.speed);
-            } else if (mapping.rightKey.isDown){
-                paddle.sprite.setVelocityX(paddle.speed);
-            } else {
-                paddle.sprite.setVelocityX(0);
-                paddle.sprite.setVelocityY(0);
-            }
-
-        });
+        // actualiza los jugadores
+        this.player1.update();
+        this.player2.update();
     }
 }
