@@ -3,7 +3,14 @@ import { meleeHitBox } from '../nonEntities/hitboxes/meleeHitBox';
 
 export class MeleePlayer extends Player {
     constructor(scene, id, x, y, controls, extracontrols){
-        super(scene, id, x, y, controls)
+        super(scene, id, controls)
+
+        //sprite del jugador
+        this.sprite = scene.physics.add.sprite(x, y, 'meleePlayer');
+        this.sprite.setDisplaySize(32, 32);
+        this.sprite.setImmovable(false);
+        this.sprite.setCollideWorldBounds(true);
+
         // MeleePlayer tiene extracontrols para registrar sus controles adicionales para atacar hacia los lados
         this.key = scene.input.keyboard.addKeys({
             up: controls.up,

@@ -1,13 +1,12 @@
 export class Player {
 
-    constructor(scene, id, x, y, controls) {
+    constructor(scene, id, controls) {
         this.health = 100;
         this.armour = 100;
         this.maxArmour = 100;
         this.wounds = 4;
         this.state = 'Alive';
         //this.items[5];
-        
         this.id = id;
         this.scene = scene;
         this.speed = 300;

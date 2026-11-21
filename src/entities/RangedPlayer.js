@@ -3,9 +3,14 @@ import { projectileHitBox } from '../nonEntities/hitboxes/projectileHitBox';
 
 export class RangedPlayer extends Player {
     constructor(scene, id, x, y, controls){
-        super(scene, id, x, y, controls);
-
         this.cooldown = 5;
+        super(scene, id, controls)
+        
+        //sprite del jugador
+        this.sprite = scene.physics.add.sprite(x, y, 'rangePlayer');
+        this.sprite.setDisplaySize(32, 32);
+        this.sprite.setImmovable(false);
+        this.sprite.setCollideWorldBounds(true);
     }
 
     update(){
