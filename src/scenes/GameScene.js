@@ -15,7 +15,8 @@ export class GameScene extends Phaser.Scene {
 
     preload() {
         // Load assets
-        this.load.image('player', 'assets/images/paddle.png')
+        this.load.image('player', 'assets/images/paddle.png');
+        this.load.image('PLACEHOLDERIMG', 'assets/images/thehi.jpg');
 
         // Hit sound
         this.load.audio('hit', 'assets/audio/hit.mp3');
@@ -88,7 +89,7 @@ export class GameScene extends Phaser.Scene {
         });
 
         //Setup collisions
-        this.physics.add.collider(this.player1.sprite, this.player2.sprite);
+        //this.physics.add.collider(this.player1.sprite, this.player2.sprite);
 
         // Crear grupo estático de plataformas: Se debería hacer en otra función pero es para probar
         let plataformas = this.physics.add.staticGroup();
