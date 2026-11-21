@@ -15,7 +15,8 @@ export class GameScene extends Phaser.Scene {
 
     preload() {
         // Load assets
-        this.load.image('player', 'assets/images/paddle.png')
+        this.load.image('rangePlayer', 'assets/images/rangePlayer.png')
+        this.load.image('meleePlayer', 'assets/images/meleePlayer.png')
 
         // Hit sound
         this.load.audio('hit', 'assets/audio/hit.mp3');
@@ -25,8 +26,8 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // Looping background music
-        this.music = this.sound.add('music', { loop: true, volume: 0.3 });
+        // Looping background music, Silenciada temporalmente por que es un AI SLOP
+        this.music = this.sound.add('music', { loop: true, volume: 0.0 });
         this.music.play();
 
         // Pause/resume the music with the scene and stop it on exit
@@ -38,14 +39,9 @@ export class GameScene extends Phaser.Scene {
             this.music.destroy();
         });
 
-        // Add mid line
-        for (let i = 0; i < 12; i++) {
-            this.add.rectangle(400, i * 50 + 25, 10, 30, 0x666666);
-        }
-
-        // Scores
-        this.scoreLeft = this.add.text(200, 50, '0', { fontSize: '48px' }).setOrigin(0.5);
-        this.scoreRight = this.add.text(600, 50, '0', { fontSize: '48px' }).setOrigin(0.5);
+        // UI de los jugadores, placeholder
+        this.scoreLeft = this.add.text(200, 50, 'P1', { fontSize: '48px' }).setOrigin(0.5);
+        this.scoreRight = this.add.text(600, 50, 'P2', { fontSize: '48px' }).setOrigin(0.5);
 
         // Collisions on all sides 
         this.physics.world.setBoundsCollision(true, true, true, true);
@@ -87,8 +83,8 @@ export class GameScene extends Phaser.Scene {
             attackRight: 'J'
         });
 
-        //Setup collisions
-        this.physics.add.collider(this.player1.sprite, this.player2.sprite);
+        // Colisión con jugadores, REMOVIDO TEMPORALMENTE debido al problema con las colisiones entre jugadores
+        //this.physics.add.collider(this.player1.sprite, this.player2.sprite);
 
         // Crear grupo estático de plataformas: Se debería hacer en otra función pero es para probar
         let plataformas = this.physics.add.staticGroup();
@@ -100,7 +96,6 @@ export class GameScene extends Phaser.Scene {
         plataformas.create(600, 400, 'suelo');
         plataformas.create(50, 250, 'suelo');
 
-        // Colisión con todas
         this.physics.add.collider(this.player1.sprite, plataformas);
         this.physics.add.collider(this.player2.sprite, plataformas);
     }
