@@ -31,43 +31,54 @@ export class MeleePlayer extends Player {
     }
 
     update(delta){
+        super.handleState();
+
         if(this.cooldown > 0){
             this.cooldown -= delta;
         }
 
-        super.move();
-        this.handleInput(delta);
+        if (this.actionState === 'Idle'){
+            super.move();
+        }
+        if (this.lifeState === 'Alive'){
+            this.handleInput(delta);
+        }
     }
     handleInput(delta){
-        //al presionar una tecla hara que mire hacia lookX y lookY
-        // lookX y lookY empiezan como la misma posicion del jugador
-        let lookX = this.sprite.x;
-        let lookY = this.sprite.y;
-        //si ataca hacia arriba tendra que mirar hacia arriba, para eso lookY se resta 10, ahora lookX es la misma X que el jugador
-        // pero look Y esta un poco por arriba, asi que al llamar a lookAt estara mirando a un punto justo encima suya
-        if(this.key.attackUp.isDown){
-            lookY = this.sprite.y - 30;
+        
+        if(this.actionState === 'Idle'){
+            //al presionar una tecla hara que mire hacia lookX y lookY
+            // lookX y lookY empiezan como la misma posicion del jugador
+            let lookX = this.sprite.x;
+            let lookY = this.sprite.y;
+            //si ataca hacia arriba tendra que mirar hacia arriba, para eso lookY se resta 10, ahora lookX es la misma X que el jugador
+            // pero look Y esta un poco por arriba, asi que al llamar a lookAt estara mirando a un punto justo encima suya
+            if(this.key.attackUp.isDown){
+                lookY = this.sprite.y - 30;
+            }
+            if(this.key.attackDown.isDown){
+                lookY = this.sprite.y + 30;
+            }
+            if(this.key.attackLeft.isDown){
+                lookX = this.sprite.x - 30;
+            }
+            if(this.key.attackRight.isDown){
+                lookX = this.sprite.x + 30;
+            }
+            //se que esto es un poco feo pero es la unica forma que se me ocurre de hacer que fire() pueda apuntar perpendicularmente
+            if(this.key.attackUp.isDown || this.key.attackDown.isDown || this.key.attackLeft.isDown || this.key.attackRight.isDown){
+                super.lookAt(lookX, lookY);
+                this.fire(lookX, lookY);
+            }
+            //al llamar siempre a lookAt(lookX, lookY) si presiona dos teclas cambiaran ambos lookX y lookY
+            // y podra mirar de forma perpendicular
         }
-        if(this.key.attackDown.isDown){
-            lookY = this.sprite.y + 30;
-        }
-        if(this.key.attackLeft.isDown){
-            lookX = this.sprite.x - 30;
-        }
-        if(this.key.attackRight.isDown){
-            lookX = this.sprite.x + 30;
-        }
-        //se que esto es un poco feo pero es la unica forma que se me ocurre de hacer que fire() pueda apuntar perpendicularmente
-        if(this.key.attackUp.isDown || this.key.attackDown.isDown || this.key.attackLeft.isDown || this.key.attackRight.isDown){
-            super.lookAt(lookX, lookY);
-            this.fire(lookX, lookY);
-        }
-        //al llamar siempre a lookAt(lookX, lookY) si presiona dos teclas cambiaran ambos lookX y lookY
-        // y podra mirar de forma perpendicular
+        
         
         //falta checkear items
-        /*
-        if(this.key.healOther.isDown && this.touchingFriend){
+        const canCureFriend = (this.scene.player1.health < this.scene.player1.wounds * 25) || (this.scene.player1.armour < this.scene.player1.maxArmour);
+        if(this.key.healOther.isDown && this.touchingFriend
+            && canCureFriend && (this.actionState === 'Idle' || this.actionState === 'HealingOther')){
             this.healFriendProgress -= delta;
             if(this.healFriendProgress < 0){
                 super.cureFriend(this.scene.player2);
@@ -75,13 +86,15 @@ export class MeleePlayer extends Player {
             }
         } else{
             this.healFriendProgress = 1500;
-        }*/
-
-        if(this.key.healOther.isDown){
-            super.takeDamage(1);
         }
+
+        //if(this.key.healOther.isDown){
+        //    super.takeDamage(1);
+        //}
         
-        if(this.key.healSelf.isDown){
+        const canCureSelf = (this.health < this.wounds * 25) || (this.armour < this.maxArmour);
+        if(this.key.healSelf.isDown
+            && canCureSelf && (this.actionState === 'Idle' || this.actionState === 'HealingSelf')){
             this.healSelfProgress -= delta;
             if(this.healSelfProgress < 0){
                 super.cureSelf();

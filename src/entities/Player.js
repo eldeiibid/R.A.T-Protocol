@@ -13,7 +13,7 @@ export class Player {
         this.cooldown = 0;
         this.cooldownZero = 0;
         this.reloadTime = 0;
-        this.reloadTimeZero = 0;
+        this.reloading = false;
 
         this.touchingFriend = false;
         this.healSelfProgress = 2500;
@@ -91,6 +91,11 @@ export class Player {
     cureFriend(player){        
         //primero revisa si la vida necesita curacion y si no cura la armadura
         // falta checkear que tenga los items
+        if(player.lifeState === 'Downed'){
+            player.health = player.wounds * 25;
+            return;
+        }
+
         if (player.health < player.wounds * 25){
             player.health = Math.min(player.health + 25, player.wounds * 25);
             console.log('im so green ' + player.health);
@@ -134,14 +139,30 @@ export class Player {
         if (this.health === 0){
             if(this.wounds === 0){
                 this.lifeState = 'Dead';
+                this.sprite.body.enable = false;
+                this.sprite.setActive(false);
+                this.sprite.setVisible(false);
+                this.actionState = 'None';
             } else {
-                this.lifeState = 'Downed'; 
+                if(this.lifeState === 'Alive'){
+                    this.wounds--;
+                }
+                this.lifeState = 'Downed';
+                this.speed = 25;
             }
-            this.actionState = 'None';
         } else {
             this.lifeState = 'Alive';
+            this.speed = 200;
         }
 
-
+        if (this.healFriendProgress != 1500){
+            this.actionState = 'HealingOther';
+        } else if (this.healSelfProgress != 2500){
+            this.actionState = 'HealingSelf';
+        } else if(this.reloading) {
+            this.actionState = 'Reloading';
+        } else {
+            this.actionState = 'Idle';
+        }
     }
 }
