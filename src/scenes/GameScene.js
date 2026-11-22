@@ -22,7 +22,7 @@ export class GameScene extends Phaser.Scene {
         this.load.image('tiles', 'assets/images/tilemap.png')
 
         // Load Tile map
-        this.load.tilemapTiledJSON('testmap', 'assets/maps/test.json');
+        this.load.tilemapTiledJSON('testmap', 'assets/maps/test_map.json');
 
         // Hit sound
         this.load.audio('hit', 'assets/audio/hit.mp3');
@@ -46,10 +46,7 @@ export class GameScene extends Phaser.Scene {
             this.music.destroy();
         });
 
-        // Collisions on all sides 
-        this.physics.world.setBoundsCollision(true, true, true, true);
-
-        // Setup almost everything
+        // Crea el tilemap/jugadores/enemigos
         this.setUpWorld();
 
         // UI de los jugadores, placeholder
@@ -65,44 +62,102 @@ export class GameScene extends Phaser.Scene {
 
     setUpWorld() {
 
-        //1º crear mapa de tilemap, set de tiles y capa de tiles
+        //El tilemap es de 25x16 tiles, cada tile es de 32x32px
+        //Para dejar espacio visible de UI (600px de ventana - 16*32) 
+        const TILEMAP_YOFFSET = 88;
+        //crear mapa de tilemap, set de tiles y capa de tiles
         const map = this.make.tilemap({key: 'testmap', tileWidth: 32, tileHeight: 32}); //1:nombre del archivo json, 2:tamaño de tile
         const tileset = map.addTilesetImage('tileset', 'tiles'); //1: nombre del tileset en el archivo, 2: nombre del asset de la imagen con los tiles
-        const layer = map.createLayer('layer1', tileset, 0 , 24); //1: nombre de la capa en el archivo,2: tileset, 3: las coordenadas en las que se empieza a dibujar
+        
+        const terrainLayer = map.createLayer('terrainLayer', tileset, 0 , TILEMAP_YOFFSET); //1: nombre de la capa en el archivo,2: tileset, 3: las coordenadas en las que se empieza a dibujar
+        terrainLayer.setCollisionBetween(2, 3); //id de los tiles en el archivo
+        
+        const entityLayer = map.createLayer('entityLayer', tileset, 0, TILEMAP_YOFFSET);
+        //ocultar la capa para que no se puedan ver los tiles de guía
+        entityLayer.setVisible(false);
 
-        //2º crea los jugadores como objetos de esta escena, introduce la escena, el id del jugador, su posicion y sus controles        
-        this.player1 = new RangedPlayer(this, 'player1', 50, 300, {
-            up: 'UP',
-            down: 'DOWN',
-            left: 'LEFT',
-            right: 'RIGHT',
-            interact: 'NUMPAD_ZERO',
-            healSelf: 'CTRL',
-            healOther: 'SHIFT'
+        this.spawnPlayers(entityLayer, terrainLayer);
+        //Crear array de enemigos, de pruebas, se debería hacer en otra funcion
+        this.enemies = []
+        this.spawnEnemies(entityLayer);
+
+    }
+
+    //lee de la capa de entidades del tilemap los los jugadores y los crea.
+    spawnPlayers(entityLayer, terrainLayer) {
+        
+        // id del tile en el json
+        const RANGE_TILE_ID = 5;
+        const MELEE_TILE_ID = 6;
+        let meleePlayerFound = false
+        let rangePlayerFound = false
+
+        entityLayer.forEachTile(tile => {
+            if (tile.index === RANGE_TILE_ID && !rangePlayerFound) {
+                // centrar tile en coordenadas del mundo
+                const x = tile.getCenterX();
+                const y = tile.getCenterY();
+                
+                //crea el jugador como objetos de esta escena, introduce la escena, el id del jugador, su posicion y sus controles        
+                this.player1 = new RangedPlayer(this, 'player1', x, y, {
+                    up: 'UP',
+                    down: 'DOWN',
+                    left: 'LEFT',
+                    right: 'RIGHT',
+                    interact: 'NUMPAD_ZERO',
+                    healSelf: 'CTRL',
+                    healOther: 'SHIFT'
+                });
+                rangePlayerFound = true;
+            }
+            if (tile.index === MELEE_TILE_ID && !meleePlayerFound) {
+                // centrar tile en coordenadas del mundo
+                const x = tile.getCenterX();
+                const y = tile.getCenterY();
+
+                // el jugador a Melee tiene controles adicionales para sus ataques
+                this.player2 = new MeleePlayer(this, 'player2', x, y, {
+                    up: 'W',
+                    down: 'S',
+                    left: 'A',
+                    right: 'D',
+                    interact: ' ',
+                    healSelf: 'Q',
+                    healOther: 'F'
+                }, {
+                    attackUp: 'Y',
+                    attackDown: 'H',
+                    attackLeft: 'G',
+                    attackRight: 'J'
+                });
+                meleePlayerFound = true;
+            }
         });
-        // el jugador a Melee tiene controles adicionales para sus ataques
-        this.player2 = new MeleePlayer(this, 'player2', 750, 300, {
-            up: 'W',
-            down: 'S',
-            left: 'A',
-            right: 'D',
-            interact: ' ',
-            healSelf: 'Q',
-            healOther: 'F'
-        }, {
-            attackUp: 'Y',
-            attackDown: 'H',
-            attackLeft: 'G',
-            attackRight: 'J'
+
+        //añadir colliders con el tilemap
+        this.physics.add.collider(this.player1.sprite, terrainLayer);
+        this.physics.add.collider(this.player2.sprite, terrainLayer);
+        
+    }
+
+    //lee de la capa de entidades del tilemap los enemigos y los crea.
+    spawnEnemies(layer) {
+
+        // id del tile en el json
+        const TILE_ID = 7;
+        
+        layer.forEachTile(tile => {
+            if (tile.index === TILE_ID) {
+                // centrar tile en coordenadas del mundo
+                const x = tile.getCenterX();
+                const y = tile.getCenterY();
+                //crear nuevo enemigo
+                this.enemies.push(new Enemy(this, x, y)); 
+                //añadir colision con el terreno || TEST
+                //this.physics.add.collider(enemy.sprite, layer); 
+            }
         });
 
-        //3º Crear a los enemigos, de pruebas, se debería hacer en otra funcion
-        this.enemy = new Enemy(this, 100, 100);
-
-        //4º añadir colliders con el tilemap
-        layer.setCollisionBetween(2, 3); //id de los tiles en el archivo
-        this.physics.add.collider(this.player1.sprite, layer);
-        this.physics.add.collider(this.player2.sprite, layer);
     }
 
     update(time, delta) {
@@ -118,5 +173,6 @@ export class GameScene extends Phaser.Scene {
         // actualiza los jugadores
         this.player1.update(delta);
         this.player2.update(delta);
+        this.enemies.forEach(enemy => {enemy.update()});
     }
 }
