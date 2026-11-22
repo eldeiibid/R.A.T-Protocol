@@ -26,18 +26,19 @@ export class MeleePlayer extends Player {
             attackRight: extracontrols.attackRight
         });
 
-        this.cooldown = 5;
+        this.cooldownZero = 250;
+        this.cooldown = this.cooldownZero;
     }
 
-    update(){
+    update(delta){
         if(this.cooldown > 0){
-            this.cooldown = this.cooldown - 1;
+            this.cooldown -= delta;
         }
 
         super.move();
-        this.handleInput();
+        this.handleInput(delta);
     }
-    handleInput(){
+    handleInput(delta){
         //al presionar una tecla hara que mire hacia lookX y lookY
         // lookX y lookY empiezan como la misma posicion del jugador
         let lookX = this.sprite.x;
@@ -64,7 +65,31 @@ export class MeleePlayer extends Player {
         //al llamar siempre a lookAt(lookX, lookY) si presiona dos teclas cambiaran ambos lookX y lookY
         // y podra mirar de forma perpendicular
         
+        //falta checkear items
+        /*
+        if(this.key.healOther.isDown && this.touchingFriend){
+            this.healFriendProgress -= delta;
+            if(this.healFriendProgress < 0){
+                super.cureFriend(this.scene.player2);
+                this.healFriendProgress = 1500;
+            }
+        } else{
+            this.healFriendProgress = 1500;
+        }*/
+
+        if(this.key.healOther.isDown){
+            super.takeDamage(1);
+        }
         
+        if(this.key.healSelf.isDown){
+            this.healSelfProgress -= delta;
+            if(this.healSelfProgress < 0){
+                super.cureSelf();
+                this.healSelfProgress = 2500;
+            }
+        } else{
+            this.healSelfProgress = 2500;
+        }
     }
 
     fire(x, y){
@@ -72,13 +97,13 @@ export class MeleePlayer extends Player {
             x: x,
             y: y
         };
-        if(this.cooldown === 0){
+        if(this.cooldown <= 0){
             new meleeHitBox(
                 this.scene,
                 this,
                 dir
             );
-            this.cooldown = 5;
+            this.cooldown = this.cooldownZero;
         }
     }
 }

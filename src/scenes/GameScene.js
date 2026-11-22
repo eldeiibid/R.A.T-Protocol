@@ -106,8 +106,17 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+        //revisa si los jugadores se estan tocando (para interactuar entre ellos)
+        const playersTouching = this.physics.overlap(
+            this.player1.sprite,
+            this.player2.sprite
+        );
+
+        this.player1.touchingFriend = playersTouching;
+        this.player2.touchingFriend = playersTouching;
+
         // actualiza los jugadores
-        this.player1.update();
-        this.player2.update();
+        this.player1.update(delta);
+        this.player2.update(delta);
     }
 }
