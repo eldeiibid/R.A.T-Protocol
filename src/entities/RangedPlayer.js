@@ -3,8 +3,8 @@ import { projectileHitBox } from '../nonEntities/hitboxes/projectileHitBox';
 
 export class RangedPlayer extends Player {
     constructor(scene, id, x, y, controls){
-        this.cooldown = 5;
         super(scene, id, controls)
+        this.cooldown = 5;
         
         //sprite del jugador
         this.sprite = scene.physics.add.sprite(x, y, 'rangePlayer');
@@ -36,7 +36,7 @@ export class RangedPlayer extends Player {
         }
     }
     fire(){
-        this.cooldown = 5;
+        this.cooldown = 25;
         const pointer = this.scene.input.activePointer;
         const dir = {
             x: pointer.x - this.sprite.x,

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
-import { Player } from '../entities/Player';
 import { RangedPlayer } from '../entities/RangedPlayer';
 import { MeleePlayer } from '../entities/MeleePlayer';
+import { Enemy } from '../entities/Enemy';
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -15,10 +15,14 @@ export class GameScene extends Phaser.Scene {
 
     preload() {
         // Load assets
-        this.load.image('player', 'assets/images/paddle.png');
         this.load.image('PLACEHOLDERIMG', 'assets/images/thehi.jpg');
-        this.load.image('rangePlayer', 'assets/images/rangePlayer.png')
-        this.load.image('meleePlayer', 'assets/images/meleePlayer.png')
+        this.load.image('rangePlayer', 'assets/images/rangePlayer.png');
+        this.load.image('meleePlayer', 'assets/images/meleePlayer.png');
+        this.load.image('enemy', 'assets/images/enemy.png');
+        this.load.image('tiles', 'assets/images/tilemap.png')
+
+        // Load Tile map
+        this.load.tilemapTiledJSON('testmap', 'assets/maps/test.json');
 
         // Hit sound
         this.load.audio('hit', 'assets/audio/hit.mp3');
@@ -28,6 +32,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
+       
         // Looping background music, Silenciada temporalmente por que es un AI SLOP
         this.music = this.sound.add('music', { loop: true, volume: 0.0 });
         this.music.play();
@@ -41,15 +46,15 @@ export class GameScene extends Phaser.Scene {
             this.music.destroy();
         });
 
-        // UI de los jugadores, placeholder
-        this.scoreLeft = this.add.text(200, 50, 'P1', { fontSize: '48px' }).setOrigin(0.5);
-        this.scoreRight = this.add.text(600, 50, 'P2', { fontSize: '48px' }).setOrigin(0.5);
-
         // Collisions on all sides 
         this.physics.world.setBoundsCollision(true, true, true, true);
 
-        // Setup players
-        this.setUpPlayers();
+        // Setup almost everything
+        this.setUpWorld();
+
+        // UI de los jugadores, placeholder
+        this.scoreLeft = this.add.text(200, 50, 'P1', { fontSize: '48px' }).setOrigin(0.5);
+        this.scoreRight = this.add.text(600, 50, 'P2', { fontSize: '48px' }).setOrigin(0.5);
 
         // Pause with ESC and show the pause menu on top
         this.input.keyboard.on('keydown-ESC', () => {
@@ -58,8 +63,14 @@ export class GameScene extends Phaser.Scene {
         });
     }
 
-    setUpPlayers() {
-        //crea los jugadores como objetos de esta escena, introduce la escena, el id del jugador, su posicion y sus controles        
+    setUpWorld() {
+
+        //1º crear mapa de tilemap, set de tiles y capa de tiles
+        const map = this.make.tilemap({key: 'testmap', tileWidth: 32, tileHeight: 32}); //1:nombre del archivo json, 2:tamaño de tile
+        const tileset = map.addTilesetImage('tileset', 'tiles'); //1: nombre del tileset en el archivo, 2: nombre del asset de la imagen con los tiles
+        const layer = map.createLayer('layer1', tileset, 0 , 24); //1: nombre de la capa en el archivo,2: tileset, 3: las coordenadas en las que se empieza a dibujar
+
+        //2º crea los jugadores como objetos de esta escena, introduce la escena, el id del jugador, su posicion y sus controles        
         this.player1 = new RangedPlayer(this, 'player1', 50, 300, {
             up: 'UP',
             down: 'DOWN',
@@ -85,21 +96,13 @@ export class GameScene extends Phaser.Scene {
             attackRight: 'J'
         });
 
-        // Colisión con jugadores, REMOVIDO TEMPORALMENTE debido al problema con las colisiones entre jugadores
-        //this.physics.add.collider(this.player1.sprite, this.player2.sprite);
+        //3º Crear a los enemigos, de pruebas, se debería hacer en otra funcion
+        this.enemy = new Enemy(this, 100, 100);
 
-        // Crear grupo estático de plataformas: Se debería hacer en otra función pero es para probar
-        let plataformas = this.physics.add.staticGroup();
-        // Añadir plataformas
-        plataformas.create(400, 568, 'suelo')
-            .setScale(2)
-            .refreshBody();  // Actualizar tras modificar
-        
-        plataformas.create(600, 400, 'suelo');
-        plataformas.create(50, 250, 'suelo');
-
-        this.physics.add.collider(this.player1.sprite, plataformas);
-        this.physics.add.collider(this.player2.sprite, plataformas);
+        //4º añadir colliders con el tilemap
+        layer.setCollisionBetween(2, 3); //id de los tiles en el archivo
+        this.physics.add.collider(this.player1.sprite, layer);
+        this.physics.add.collider(this.player2.sprite, layer);
     }
 
     update(time, delta) {

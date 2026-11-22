@@ -9,12 +9,7 @@ export class Player {
         //this.items[5];
         this.id = id;
         this.scene = scene;
-        this.speed = 300;
-
-        this.sprite = scene.physics.add.sprite(x, y, 'player');
-        this.sprite.setDisplaySize(20, 100);
-        this.sprite.setImmovable(false);
-        this.sprite.setCollideWorldBounds(true);
+        this.speed = 200;
 
         // this.key devuelve la accion que las teclas han registrado,
         // en caso del RangedPlayer UP sera up, pero MeleePlayer W sera up
@@ -81,7 +76,8 @@ export class Player {
     interactWith(object){
 
     }
-    getDamaged(D){
+
+    takeDamage(D){
         this.health = this.health - D;
         if(this.health < 0){
             this.health = 0;
