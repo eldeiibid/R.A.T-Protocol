@@ -6,7 +6,7 @@ export class projectileHitBox extends damageHitBox{
 
         this.speed = 600;
         this.sprite = scene.physics.add.sprite(origin.sprite.x, origin.sprite.y, 'PLACEHOLDERIMG');
-        this.sprite.setDisplaySize(20, 20);
+        this.sprite.setDisplaySize(12, 12);
         this.sprite.setCollideWorldBounds(false);
         
         const mod = Math.hypot(direction.x, direction.y);

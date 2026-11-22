@@ -4,7 +4,7 @@ export class meleeHitBox extends damageHitBox{
     constructor(scene, origin, position){
         super(scene, origin, 100);
 
-        this.sprite = scene.add.zone(position.x, position.y, 100, 100);
+        this.sprite = scene.add.zone(position.x, position.y, 64, 64);
 
         scene.physics.add.existing(this.sprite);
 
