@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { RangedPlayer } from '../entities/RangedPlayer';
 import { MeleePlayer } from '../entities/MeleePlayer';
 import { Enemy } from '../entities/Enemy';
+import { Pathfinder } from '../lib/Pathfinder';
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -71,20 +72,33 @@ export class GameScene extends Phaser.Scene {
         
         const terrainLayer = map.createLayer('terrainLayer', tileset, 0 , TILEMAP_YOFFSET); //1: nombre de la capa en el archivo,2: tileset, 3: las coordenadas en las que se empieza a dibujar
         terrainLayer.setCollisionBetween(2, 3); //id de los tiles en el archivo
+        //Pathfinder para detectar el terreno
+        this.pathfinder = new Pathfinder(terrainLayer); 
         
         const entityLayer = map.createLayer('entityLayer', tileset, 0, TILEMAP_YOFFSET);
         //ocultar la capa para que no se puedan ver los tiles de guía
         entityLayer.setVisible(false);
 
+
+        //añadir grupo de físicas para los jugadores
+        this.playerGroup = this.physics.add.group();
         this.spawnPlayers(entityLayer, terrainLayer);
-        //Crear array de enemigos, de pruebas, se debería hacer en otra funcion
+        
+        //Crear array de enemigos
         this.enemies = []
+        //añadir grupo de físicas para poder manejar a muchos enemigos
+        this.enemyGroup = this.physics.add.group();
         this.spawnEnemies(entityLayer);
 
+
+        //collider entre enemigos y con el terreno
+        this.physics.add.collider(this.enemyGroup, this.enemyGroup);
+        this.physics.add.collider(this.enemyGroup, terrainLayer);
+        this.physics.add.collider(this.playerGroup, terrainLayer)
     }
 
     //lee de la capa de entidades del tilemap los los jugadores y los crea.
-    spawnPlayers(entityLayer, terrainLayer) {
+    spawnPlayers(entityLayer) {
         
         // id del tile en el json
         const RANGE_TILE_ID = 5;
@@ -134,27 +148,28 @@ export class GameScene extends Phaser.Scene {
             }
         });
 
-        //añadir colliders con el tilemap
-        this.physics.add.collider(this.player1.sprite, terrainLayer);
-        this.physics.add.collider(this.player2.sprite, terrainLayer);
+        //añadir los jugadores a su grupo de físicas
+        this.playerGroup.add(this.player1.sprite);
+        this.playerGroup.add(this.player2.sprite);
         
     }
 
     //lee de la capa de entidades del tilemap los enemigos y los crea.
-    spawnEnemies(layer) {
+    spawnEnemies(entityLayer) {
 
         // id del tile en el json
         const TILE_ID = 7;
         
-        layer.forEachTile(tile => {
+        entityLayer.forEachTile(tile => {
             if (tile.index === TILE_ID) {
                 // centrar tile en coordenadas del mundo
                 const x = tile.getCenterX();
                 const y = tile.getCenterY();
                 //crear nuevo enemigo
-                this.enemies.push(new Enemy(this, x, y)); 
-                //añadir colision con el terreno || TEST
-                //this.physics.add.collider(enemy.sprite, layer); 
+                let enemy = new Enemy(this, x, y, this.pathfinder);
+                this.enemies.push(enemy);
+                //agregarlo al grupo de fisicas
+                this.enemyGroup.add(enemy.sprite)
             }
         });
 
@@ -173,6 +188,7 @@ export class GameScene extends Phaser.Scene {
         // actualiza los jugadores
         this.player1.update(delta);
         this.player2.update(delta);
-        this.enemies.forEach(enemy => {enemy.update()});
+        const players = [this.player1, this.player2];
+        this.enemies.forEach(enemy => {enemy.update(time, players)});
     }
 }
