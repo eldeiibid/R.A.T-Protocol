@@ -87,11 +87,11 @@ export class Player {
         if (this.health < this.wounds * 25 && this.hasItem('medPack')){
             this.health = Math.min(this.health + 25, this.wounds * 25);
             this.removeItem('medPack');
-            console.log('im so green ' + this.health);
+            //console.log('im so green ' + this.health);
         } else if(this.armour < this.maxArmour && this.hasItem('armourPiece')){
             this.armour = Math.min(this.armour + 25, this.maxArmour);
             this.removeItem('armourPiece');
-            console.log('im so grey ' + this.armour);
+            //console.log('im so grey ' + this.armour);
         }
     }
     cureFriend(player){        

@@ -9,7 +9,7 @@ export class projectileHitBox extends damageHitBox{
         this.sprite.setDisplaySize(12, 12);
         this.sprite.setCollideWorldBounds(false);
         
-        this.damage = 1;
+        this.damage = 2;
         const mod = Math.hypot(direction.x, direction.y);
         //const mod = Math.SQRT2(direction.x + direction.y);
 

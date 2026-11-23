@@ -10,13 +10,14 @@ export class meleeHitBox extends damageHitBox{
 
         this.sprite.body.setAllowGravity(false);
         this.sprite.body.setImmovable(true);
-        this.damage = 5;
+        this.damage = 50;
         scene.physics.add.overlap(
             this.sprite,
             scene.enemyGroup,
             (b, e) => {
                 const enemy = e.getData('enemy');
-                enemy.takeDamage(this.damage);
+                this.damage -= enemy.takeDamage(this.damage);
+
             }
         );
     }

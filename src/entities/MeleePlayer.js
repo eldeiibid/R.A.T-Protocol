@@ -81,7 +81,7 @@ export class MeleePlayer extends Player {
             && canCureFriend && (this.actionState === 'Idle' || this.actionState === 'HealingOther')){
             this.healFriendProgress -= delta;
             if(this.healFriendProgress < 0){
-                super.cureFriend(this.scene.player2);
+                super.cureFriend(this.scene.player1);
                 this.healFriendProgress = 1500;
             }
         } else{

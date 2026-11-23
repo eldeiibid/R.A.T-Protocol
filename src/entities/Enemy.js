@@ -129,19 +129,21 @@ export class Enemy {
     }
 
     takeDamage(dmg, dir) {
+        let damageTaken = dmg - this.health;
         this.health = this.health - dmg;
         if(this.health < 0){
             this.health = 0;
             this.die();
         }
-        console.log('enemy_ouch: ' + this.health);
+        return damageTaken;
+        //console.log('enemy_ouch: ' + this.health);
     }
 
     die() {
         this.isAlive = false;
         this.sprite.body.enable = false;
         this.sprite.setActive(false);
-        this.sprite.destroy();
+        //this.sprite.destroy();
         this.scene.enemies.pop();
     }
 }

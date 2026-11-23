@@ -5,6 +5,7 @@ import { Enemy } from '../entities/Enemy';
 import { PickableObject } from '../objects/PickableObject';
 import { InteractableObject } from '../objects/InteractableObject';
 import { Pathfinder } from '../lib/Pathfinder';
+import { GameUI } from '../ui/GameUI';
 
 const LEVELS = ['test_map', 'test2'];
 
@@ -64,9 +65,8 @@ export class GameScene extends Phaser.Scene {
         // Crea el tilemap/jugadores/enemigos
         this.setUpWorld();
 
-        // UI de los jugadores, placeholder
-        this.scoreLeft = this.add.text(200, 50, 'P1', { fontSize: '48px' }).setOrigin(0.5);
-        this.scoreRight = this.add.text(600, 50, 'P2', { fontSize: '48px' }).setOrigin(0.5);
+        // UI de los jugadores
+        this.gameUI = new GameUI(this);
 
         // Pause with ESC and show the pause menu on top
         this.input.keyboard.on('keydown-ESC', () => {
@@ -262,11 +262,12 @@ export class GameScene extends Phaser.Scene {
 
         //testeo de cambio de niveles
         if (this.enemies.length < 1) this.loadNextLevel();
+        // actualiza UI
+        this.gameUI.update();
     }
 
     handleEvents(id, player){
         console.log(player.id + ' ha tocado ' + id);
-        
     }
 
     loadNextLevel() {
