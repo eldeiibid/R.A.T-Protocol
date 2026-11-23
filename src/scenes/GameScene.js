@@ -6,7 +6,7 @@ import { PickableObject } from '../objects/PickableObject';
 import { InteractableObject } from '../objects/InteractableObject';
 import { Pathfinder } from '../lib/Pathfinder';
 
-const LEVELS = ['test_map'];
+const LEVELS = ['test_map', 'test2'];
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -261,7 +261,7 @@ export class GameScene extends Phaser.Scene {
         this.enemies.forEach(enemy => {enemy.update(time, players, delta)});
 
         //testeo de cambio de niveles
-        if (this.enemies.length < 1) this.nextLevel();
+        if (this.enemies.length < 1) this.loadNextLevel();
     }
 
     handleEvents(id, player){
@@ -269,7 +269,7 @@ export class GameScene extends Phaser.Scene {
         
     }
 
-    nextLevel() {
+    loadNextLevel() {
     if (this.changingLevel) return; //para evitar llamar a la funcion varias veces
     this.changingLevel = true;
 
