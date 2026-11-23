@@ -2,6 +2,9 @@ import Phaser from 'phaser';
 import { RangedPlayer } from '../entities/RangedPlayer';
 import { MeleePlayer } from '../entities/MeleePlayer';
 import { Enemy } from '../entities/Enemy';
+import { SceneObjects } from '../objects/SceneObjects';
+import { PickableObject } from '../objects/PickableObject';
+import { InteractableObject } from '../objects/InteractableObject';
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -81,6 +84,44 @@ export class GameScene extends Phaser.Scene {
         this.enemies = []
         this.spawnEnemies(entityLayer);
 
+        //Crear objetos de la escena
+        // por ahora un poco desorganizado a ver como lo podemos limpiar usando el tilset
+        this.sceneObjects = this.physics.add.group();
+        let newObject = new PickableObject(
+            this, 'medPack1', 32*10, 32*15, 'PLACEHOLDERIMG', 'medPack'
+        );
+        newObject.sprite.setTint(0x00FF00);
+        this.sceneObjects.add(newObject.sprite);
+        newObject = new PickableObject(
+            this, 'medPack2', 32*10, 32*16, 'PLACEHOLDERIMG', 'medPack'
+        );
+        newObject.sprite.setTint(0x00FF00);
+        this.sceneObjects.add(newObject.sprite);
+        newObject = new PickableObject(
+            this, 'medPack3', 32*10, 32*17, 'PLACEHOLDERIMG', 'medPack'
+        );
+        newObject.sprite.setTint(0x00FF00);
+        this.sceneObjects.add(newObject.sprite);
+        newObject = new PickableObject(
+            this, 'medPack4', 32*11, 32*15, 'PLACEHOLDERIMG', 'medPack'
+        );
+        newObject.sprite.setTint(0x00FF00);
+        this.sceneObjects.add(newObject.sprite);
+        newObject = new PickableObject(
+            this, 'medPack5', 32*11, 32*16, 'PLACEHOLDERIMG', 'medPack'
+        );
+        newObject.sprite.setTint(0x00FF00);
+        this.sceneObjects.add(newObject.sprite);
+        newObject = new PickableObject(
+            this, 'armourPiece1', 32*12, 32*15, 'PLACEHOLDERIMG', 'armourPiece'
+        );
+        newObject.sprite.setTint(0x8C8C8C);
+        this.sceneObjects.add(newObject.sprite);
+        newObject = new InteractableObject(
+            this, 'lever', 32*10, 32*10, 'PLACEHOLDERIMG', 500, 67
+        );
+        newObject.sprite.setTint(0xFFFF00);
+        this.sceneObjects.add(newObject.sprite);
     }
 
     //lee de la capa de entidades del tilemap los los jugadores y los crea.
@@ -169,10 +210,26 @@ export class GameScene extends Phaser.Scene {
 
         this.player1.touchingFriend = playersTouching;
         this.player2.touchingFriend = playersTouching;
-
+        // revisa colisiones con objetos interactuables:
+        this.player1.interactingObject = null;
+        this.player2.interactingObject = null;
+        
+        this.physics.overlap(this.player1.sprite, this.sceneObjects, (p, o) => {
+            this.player1.touchingObject(o.getData('sceneObject'));
+        });
+        this.physics.overlap(this.player2.sprite, this.sceneObjects, (p, o) => {
+            this.player2.touchingObject(o.getData('sceneObject'));
+        });
+         
         // actualiza los jugadores
         this.player1.update(delta);
         this.player2.update(delta);
         this.enemies.forEach(enemy => {enemy.update()});
+
+        
+    }
+
+    handleEvents(id, player){
+        console.log(player.id + ' ha tocado ' + id);
     }
 }

@@ -1,3 +1,5 @@
+import { PickableObject } from "../objects/PickableObject";
+
 export class Player {
 
     constructor(scene, id, controls) {
@@ -5,7 +7,7 @@ export class Player {
         this.armour = 100;
         this.maxArmour = 100;
         this.wounds = 4;
-        //this.items[5];
+        this.items = [null, null, null, null, null];
         this.id = id;
         this.scene = scene;
         this.speed = 200;
@@ -20,6 +22,9 @@ export class Player {
         this.healFriendProgress = 1500;
         this.lifeState = 'Alive';
         this.actionState = 'Idle';
+
+        this.interactionProgress = 0;
+        this.interactingObject = null;
 
         // this.key devuelve la accion que las teclas han registrado,
         // en caso del RangedPlayer UP sera up, pero MeleePlayer W sera up
@@ -96,16 +101,15 @@ export class Player {
             return;
         }
 
-        if (player.health < player.wounds * 25){
+        if (player.health < player.wounds * 25 && this.hasItem('medPack')){
             player.health = Math.min(player.health + 25, player.wounds * 25);
+            this.removeItem('medPack');
             console.log('im so green ' + player.health);
-        } else if(player.armour < player.maxArmour){
+        } else if(player.armour < player.maxArmour  && this.hasItem('armourPiece')){
             player.armour = Math.min(player.armour + 25, player.maxArmour);
+            this.removeItem('armourPiece');
             console.log('im so grey ' + player.armour);
         }
-    }
-    interactWith(object){
-
     }
 
     takeDamage(D){
@@ -122,6 +126,54 @@ export class Player {
         }
         console.log(this.id + ' vida: ' + this.health + 'armour:' + this.armour);
     }
+
+    //Items:
+    // medPack
+    // armourPiece
+    addItem(item) {
+        const slot = this.items.indexOf(null);
+
+        if (slot != -1) {
+            this.items[slot] = item;
+            return true;
+        }
+        return false;
+    }
+
+    removeItem(item) {
+        const slot = this.items.indexOf(item);
+
+        if (slot != -1) {
+            this.items[slot] = null;
+            return true;
+        }
+        return false;
+    }
+    hasItem(item) {
+        const slot = this.items.indexOf(item);
+        return slot != -1;
+    }
+
+    touchingObject(object){
+        this.interactingObject = object;
+    }
+    
+    interactWith(object, delta){
+        //console.log('paws at ' + object.id);
+
+        //if (object.id === 'medPack' || object.id === 'armourPiece'){
+        if(object instanceof PickableObject){
+            object.interact(this);
+        }
+        else {
+            if(this.interactionProgress >= object.interactionTime){
+                object.activate(this);
+            } else{
+                this.interactionProgress += delta;
+            }
+        }
+    }
+
     //lifeState:
     //'Alive': esta vivo
     //'Downed': derribado, puede ser levantado pero pierde una wound
@@ -161,8 +213,12 @@ export class Player {
             this.actionState = 'HealingSelf';
         } else if(this.reloading) {
             this.actionState = 'Reloading';
+        } else if(this.interactionProgress != 0){
+            this.actionState = 'Interacting'
         } else {
             this.actionState = 'Idle';
         }
     }
+
+    
 }
