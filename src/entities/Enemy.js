@@ -1,39 +1,117 @@
+import Phaser from 'phaser';
 export class Enemy {
 
-    constructor (scene, x, y) {
+    constructor (scene, x, y, pathfinder) {
         this.health = 100;
-        this.speed = 150;
-        this.time2bite = 5.0;
+        this.speed = 200;
+
+        this.detectionRange = 300; //px
+        this.attackRange = 30;
+        this.time2bite = 5.0; //sec
+        
         this.target = null;
-        this.TCost = 5.0;
+        this.repathInterval = 300; //ms
+        this.path = []
+        //
+        this.nextRepath = 0;
+
+        this.scene = scene;
+        this.pathfinder = pathfinder;
 
         //sprite del enemigo
         this.sprite = scene.physics.add.sprite(x, y, 'enemy');
         this.sprite.setDisplaySize(32, 32);
+        //se hace más pequeño para evitar atascarse
+        this.sprite.body.setSize(this.sprite.width * 0.8, this.sprite.height * 0.8);
         this.sprite.setImmovable(false);
         this.sprite.setCollideWorldBounds(true);
     }
 
-    update() {
+    update(time, players) {
+
+        this.chooseTarget(players, time);
+
+        if (!this.target) {
+            this.path = [];
+            this.sprite.setVelocity(0, 0);
+            return;
+        }
+
+        // Recalcular el camino cada cierto tiempo, no cada frame
+        if (time >= this.nextRepath) {
+            // se calcula añade una pequeña variación al intervalo de calculo de path para evitar que todos se muevan a la vez
+            this.nextRepath = time + this.repathInterval + Phaser.Math.Between(-50, 50);
+            this.path = this.pathfinder.findPath(
+                this.sprite.x, this.sprite.y,
+                this.target.sprite.x, this.target.sprite.y
+            );
+        }
 
         this.move();
-
     }
+
+    // Elige al jugador vivo más cercano dentro del rango.
+    chooseTarget(players, time) {
+        if (this.target && this.target.lifeState === 'Alive') {
+            const d = this.distanceTo(this.target);
+            if (d <= this.detectionRange ) return;
+        }
+
+
+        const previous = this.target;
+        this.target = null;
+        let bestDist = this.detectionRange;
+
+        for (const player of players) {
+            if (player.lifeState !== 'Alive') continue;
+            const distance = this.distanceTo(player);
+            if (distance <= bestDist) {
+                bestDist = distance;
+                this.target = player;
+            }
+        }
+
+        //calcular camino tras un retraso aleatorio corto, no en este mismo frame
+        if (this.target && this.target !== previous) {
+            this.nextRepath = time + Phaser.Math.Between(0, this.repathInterval);
+        }
+    }
+
+    //Calcula la distancia a un jugador
+    distanceTo(player) {
+        return Phaser.Math.Distance.Between(
+            this.sprite.x, this.sprite.y, player.sprite.x, player.sprite.y
+        );
+    }
+
 
     move(target) {
-        let velocityX = 0;
-        let velocityY = 0;
+        // En rango de ataque: parar y atacar
+        if (this.distanceTo(this.target) <= this.attackRange) {
+            this.sprite.setVelocity(0, 0);
+            this.attack(this.target);
+            return;
+        }
 
-        // Aplicar velocidad
+        // Descartar waypoints ya alcanzados
+        while (this.path.length > 0 &&
+               Phaser.Math.Distance.Between(
+                   this.sprite.x, this.sprite.y, this.path[0].x, this.path[0].y) < 4) {
+            this.path.shift();
+        }
+
+        //parar si ya ha llegado al destino o si el camino es muy largo
+        if (this.path.length === 0 || this.path.length * 32 > this.detectionRange) {
+            this.sprite.setVelocity(0, 0);
+            return;
+        }
+
+        const next = this.path[0];
+        const angle = Math.atan2(next.y - this.sprite.y, next.x - this.sprite.x);
         this.sprite.setVelocity(
-            velocityX * this.speed,
-            velocityY * this.speed
+            Math.cos(angle) * this.speed,
+            Math.sin(angle) * this.speed
         );
-
-    }
-
-    chooseTarget(players) {
-
     }
 
     attack(player) {
