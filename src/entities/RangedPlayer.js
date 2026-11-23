@@ -11,9 +11,9 @@ export class RangedPlayer extends Player {
         this.sprite.setImmovable(false);
         this.sprite.setCollideWorldBounds(true);
 
-        this.cooldownZero = 250;
+        this.cooldownZero = 50;
         this.cooldown = this.cooldownZero;
-        this.maxAmmo = 25;
+        this.maxAmmo = 100;
         this.ammo = this.maxAmmo;
         this.reloadTime = 2000;
 
@@ -47,7 +47,8 @@ export class RangedPlayer extends Player {
         }
 
         const canCureFriend = ((this.scene.player2.health < this.scene.player2.wounds * 25) && this.hasItem('medPack'))
-        || ((this.scene.player2.armour < this.scene.player2.maxArmour) && this.hasItem('armourPiece'));
+        || ((this.scene.player2.armour < this.scene.player2.maxArmour) && this.hasItem('armourPiece'))
+        || (this.scene.player2.lifeState === 'Downed');
         if(this.key.healOther.isDown && this.touchingFriend
             && canCureFriend && (this.actionState === 'Idle' || this.actionState === 'HealingOther')){
             this.healFriendProgress -= delta;
@@ -61,8 +62,7 @@ export class RangedPlayer extends Player {
         const canCureSelf = ((this.health < this.wounds * 25) && this.hasItem('medPack'))
         || ((this.armour < this.maxArmour) && this.hasItem('armourPiece'));
         if(this.key.healSelf.isDown
-            && canCureSelf && (this.actionState === 'Idle' || this.actionState === 'HealingSelf')
-            && this.hasItem('medPack')){
+            && canCureSelf && (this.actionState === 'Idle' || this.actionState === 'HealingSelf')){
             this.healSelfProgress -= delta;
             if(this.healSelfProgress < 0){
                 super.cureSelf();

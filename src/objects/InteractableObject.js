@@ -10,5 +10,7 @@ export class InteractableObject extends SceneObjects {
 
   activate(player) {
     this.scene.handleEvents(this.eventID, player);
+    this.sprite.body.enable = false;
+    this.sprite.setActive(false);
   }
 }

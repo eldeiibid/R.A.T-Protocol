@@ -84,18 +84,18 @@ export class Player {
     }
     cureSelf(){
         //primero revisa si la vida necesita curacion y si no cura la armadura
-        // falta checkear que tenga los items
-        if (this.health < this.wounds * 25){
+        if (this.health < this.wounds * 25 && this.hasItem('medPack')){
             this.health = Math.min(this.health + 25, this.wounds * 25);
+            this.removeItem('medPack');
             console.log('im so green ' + this.health);
-        } else if(this.armour < this.maxArmour){
+        } else if(this.armour < this.maxArmour && this.hasItem('armourPiece')){
             this.armour = Math.min(this.armour + 25, this.maxArmour);
+            this.removeItem('armourPiece');
             console.log('im so grey ' + this.armour);
         }
     }
     cureFriend(player){        
         //primero revisa si la vida necesita curacion y si no cura la armadura
-        // falta checkear que tenga los items
         if(player.lifeState === 'Downed'){
             player.health = player.wounds * 25;
             return;
@@ -105,7 +105,7 @@ export class Player {
             player.health = Math.min(player.health + 25, player.wounds * 25);
             this.removeItem('medPack');
             console.log('im so green ' + player.health);
-        } else if(player.armour < player.maxArmour  && this.hasItem('armourPiece')){
+        } else if(player.armour < player.maxArmour && this.hasItem('armourPiece')){
             player.armour = Math.min(player.armour + 25, player.maxArmour);
             this.removeItem('armourPiece');
             console.log('im so grey ' + player.armour);

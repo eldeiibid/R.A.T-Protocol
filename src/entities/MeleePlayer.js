@@ -74,8 +74,9 @@ export class MeleePlayer extends Player {
             // y podra mirar de forma perpendicular
         }
         
-        const canCureFriend = ((this.scene.player2.health < this.scene.player2.wounds * 25) && this.hasItem('medPack'))
-        || ((this.scene.player2.armour < this.scene.player2.maxArmour) && this.hasItem('armourPiece'));
+        const canCureFriend = ((this.scene.player1.health < this.scene.player1.wounds * 25) && this.hasItem('medPack'))
+        || ((this.scene.player1.armour < this.scene.player1.maxArmour) && this.hasItem('armourPiece'))
+        || (this.scene.player1.lifeState === 'Downed');
         if(this.key.healOther.isDown && this.touchingFriend
             && canCureFriend && (this.actionState === 'Idle' || this.actionState === 'HealingOther')){
             this.healFriendProgress -= delta;
@@ -87,9 +88,9 @@ export class MeleePlayer extends Player {
             this.healFriendProgress = 1500;
         }
 
-        if(this.key.healOther.isDown){
-           super.takeDamage(1);
-        }
+        //if(this.key.healOther.isDown){
+        //   super.takeDamage(1);
+        //}
         
         const canCureSelf = ((this.health < this.wounds * 25) && this.hasItem('medPack'))
         || ((this.armour < this.maxArmour) && this.hasItem('armourPiece'));

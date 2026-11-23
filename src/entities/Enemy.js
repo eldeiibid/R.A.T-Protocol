@@ -3,7 +3,7 @@ export class Enemy {
 
     constructor (scene, x, y, pathfinder) {
         this.health = 10;
-        this.speed = 200;
+        this.speed = 300;
 
         this.detectionRange = 300; //px
         this.attackRange = 30;
