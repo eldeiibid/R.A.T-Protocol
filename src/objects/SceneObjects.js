@@ -8,7 +8,7 @@ export class SceneObjects {
     this.sprite.setImmovable(true);
     this.sprite.body.setAllowGravity(false);
 
-    // Guardamos una referencia a la instancia
+    // Guarda una referencia a la instancia
     this.sprite.setData('sceneObject', this);
 
     

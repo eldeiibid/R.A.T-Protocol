@@ -9,6 +9,7 @@ export class projectileHitBox extends damageHitBox{
         this.sprite.setDisplaySize(12, 12);
         this.sprite.setCollideWorldBounds(false);
         
+        this.damage = 3;
         const mod = Math.hypot(direction.x, direction.y);
         //const mod = Math.SQRT2(direction.x + direction.y);
 
@@ -16,14 +17,15 @@ export class projectileHitBox extends damageHitBox{
         const dirY = direction.y / mod;
         this.sprite.setVelocity(dirX * this.speed, dirY * this.speed);
 
-        scene.physics.add.collider(scene.player1, this, (a, ey) => {
-            ey.destroy();
+        scene.physics.add.collider(this.sprite, scene.terrainLayer, (a, ey) => {
+            a.destroy();
         });
         scene.physics.add.overlap(
             this.sprite,
-            scene.player2,
-            (bullet, enemy) => {
-                enemy.getDamaged(this.damage);
+            scene.enemyGroup,
+            (b, e) => {
+                const enemy = e.getData('enemy');
+                enemy.takeDamage(this.damage);
                 this.destroy();
             }
         );

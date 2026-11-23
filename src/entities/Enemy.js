@@ -2,12 +2,12 @@ import Phaser from 'phaser';
 export class Enemy {
 
     constructor (scene, x, y, pathfinder) {
-        this.health = 100;
+        this.health = 10;
         this.speed = 200;
 
         this.detectionRange = 300; //px
         this.attackRange = 30;
-        this.time2bite = 5.0; //sec
+        this.time2bite = 500; //sec
         
         this.target = null;
         this.repathInterval = 300; //ms
@@ -17,7 +17,6 @@ export class Enemy {
 
         this.scene = scene;
         this.pathfinder = pathfinder;
-
         //sprite del enemigo
         this.sprite = scene.physics.add.sprite(x, y, 'enemy');
         this.sprite.setDisplaySize(32, 32);
@@ -25,29 +24,35 @@ export class Enemy {
         this.sprite.body.setSize(this.sprite.width * 0.8, this.sprite.height * 0.8);
         this.sprite.setImmovable(false);
         this.sprite.setCollideWorldBounds(true);
+        
+        this.sprite.setData('enemy', this);
+        this.isAlive = true;
     }
 
-    update(time, players) {
+    update(time, players, delta) {
+        if(this.isAlive){
+            this.chooseTarget(players, time);
 
-        this.chooseTarget(players, time);
+            if (!this.target) {
+                this.path = [];
+                this.sprite.setVelocity(0, 0);
+                return;
+            }
 
-        if (!this.target) {
-            this.path = [];
-            this.sprite.setVelocity(0, 0);
-            return;
+            // Recalcular el camino cada cierto tiempo, no cada frame
+            if (time >= this.nextRepath) {
+                // se calcula añade una pequeña variación al intervalo de calculo de path para evitar que todos se muevan a la vez
+                this.nextRepath = time + this.repathInterval + Phaser.Math.Between(-50, 50);
+                this.path = this.pathfinder.findPath(
+                    this.sprite.x, this.sprite.y,
+                    this.target.sprite.x, this.target.sprite.y
+                );
+            }
+
+            this.move(delta);
+        } else {
+            //por si se quiere implementar algo para cuando este muerto
         }
-
-        // Recalcular el camino cada cierto tiempo, no cada frame
-        if (time >= this.nextRepath) {
-            // se calcula añade una pequeña variación al intervalo de calculo de path para evitar que todos se muevan a la vez
-            this.nextRepath = time + this.repathInterval + Phaser.Math.Between(-50, 50);
-            this.path = this.pathfinder.findPath(
-                this.sprite.x, this.sprite.y,
-                this.target.sprite.x, this.target.sprite.y
-            );
-        }
-
-        this.move();
     }
 
     // Elige al jugador vivo más cercano dentro del rango.
@@ -85,12 +90,17 @@ export class Enemy {
     }
 
 
-    move(target) {
+    move(delta) {
         // En rango de ataque: parar y atacar
         if (this.distanceTo(this.target) <= this.attackRange) {
             this.sprite.setVelocity(0, 0);
-            this.attack(this.target);
+            if(this.time2bite <= 0){
+                this.attack(this.target);
+            } else{
+                this.time2bite -= delta;
+            }
             return;
+
         }
 
         // Descartar waypoints ya alcanzados
@@ -112,18 +122,26 @@ export class Enemy {
             Math.cos(angle) * this.speed,
             Math.sin(angle) * this.speed
         );
+        this.sprite.rotation = angle;
     }
 
     attack(player) {
-
+        player.takeDamage(5);
+        this.time2bite = 500;
     }
 
     takeDamage(dmg, dir) {
         this.health = this.health - dmg;
         if(this.health < 0){
             this.health = 0;
+            this.die();
         }
-        console.log(this.id + ' enemy_ouch: ' + this.health);
+        console.log('enemy_ouch: ' + this.health);
+    }
 
+    die() {
+        this.isAlive = false;
+        this.sprite.body.enable = false;
+        this.sprite.setActive(false);
     }
 }

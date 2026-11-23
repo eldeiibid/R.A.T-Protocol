@@ -73,10 +73,10 @@ export class GameScene extends Phaser.Scene {
         const map = this.make.tilemap({key: 'testmap', tileWidth: 32, tileHeight: 32}); //1:nombre del archivo json, 2:tamaño de tile
         const tileset = map.addTilesetImage('tileset', 'tiles'); //1: nombre del tileset en el archivo, 2: nombre del asset de la imagen con los tiles
         
-        const terrainLayer = map.createLayer('terrainLayer', tileset, 0 , TILEMAP_YOFFSET); //1: nombre de la capa en el archivo,2: tileset, 3: las coordenadas en las que se empieza a dibujar
-        terrainLayer.setCollisionBetween(2, 3); //id de los tiles en el archivo
+        this.terrainLayer = map.createLayer('terrainLayer', tileset, 0 , TILEMAP_YOFFSET); //1: nombre de la capa en el archivo,2: tileset, 3: las coordenadas en las que se empieza a dibujar
+        this.terrainLayer.setCollisionBetween(2, 3); //id de los tiles en el archivo
         //Pathfinder para detectar el terreno
-        this.pathfinder = new Pathfinder(terrainLayer); 
+        this.pathfinder = new Pathfinder(this.terrainLayer); 
         
         const entityLayer = map.createLayer('entityLayer', tileset, 0, TILEMAP_YOFFSET);
         //ocultar la capa para que no se puedan ver los tiles de guía
@@ -85,7 +85,7 @@ export class GameScene extends Phaser.Scene {
 
         //añadir grupo de físicas para los jugadores
         this.playerGroup = this.physics.add.group();
-        this.spawnPlayers(entityLayer, terrainLayer);
+        this.spawnPlayers(entityLayer, this.terrainLayer);
         
         //Crear array de enemigos
         this.enemies = []
@@ -134,8 +134,8 @@ export class GameScene extends Phaser.Scene {
 
         //collider entre enemigos y con el terreno
         this.physics.add.collider(this.enemyGroup, this.enemyGroup);
-        this.physics.add.collider(this.enemyGroup, terrainLayer);
-        this.physics.add.collider(this.playerGroup, terrainLayer)
+        this.physics.add.collider(this.enemyGroup, this.terrainLayer);
+        this.physics.add.collider(this.playerGroup, this.terrainLayer)
     }
 
     //lee de la capa de entidades del tilemap los los jugadores y los crea.
@@ -240,13 +240,10 @@ export class GameScene extends Phaser.Scene {
         this.player1.update(delta);
         this.player2.update(delta);
         const players = [this.player1, this.player2];
-        this.enemies.forEach(enemy => {enemy.update(time, players)});
-        
+        this.enemies.forEach(enemy => {enemy.update(time, players, delta)});
     }
 
     handleEvents(id, player){
         console.log(player.id + ' ha tocado ' + id);
-        const players = [this.player1, this.player2];
-        this.enemies.forEach(enemy => {enemy.update(time, players)});
     }
 }
