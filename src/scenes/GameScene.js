@@ -2,31 +2,42 @@ import Phaser from 'phaser';
 import { RangedPlayer } from '../entities/RangedPlayer';
 import { MeleePlayer } from '../entities/MeleePlayer';
 import { Enemy } from '../entities/Enemy';
-import { SceneObjects } from '../objects/SceneObjects';
 import { PickableObject } from '../objects/PickableObject';
 import { InteractableObject } from '../objects/InteractableObject';
 import { Pathfinder } from '../lib/Pathfinder';
+
+const LEVELS = ['test_map'];
 
 export class GameScene extends Phaser.Scene {
     constructor() {
         super('GameScene');
     }
 
-    init() {
+    init(data) {
         this.players = new Map();
         this.inputMappings = [];
+            
+        // índice del nivel actual (0 si la escena se lanza sin datos)
+        this.levelIndex = data?.levelIndex ?? 0;
+        this.fileName = LEVELS[this.levelIndex];
+        this.changingLevel = false;
     }
 
     preload() {
         // Load assets
-        this.load.image('PLACEHOLDERIMG', 'assets/images/thehi.jpg');
         this.load.image('rangePlayer', 'assets/images/rangePlayer.png');
         this.load.image('meleePlayer', 'assets/images/meleePlayer.png');
         this.load.image('enemy', 'assets/images/enemy.png');
-        this.load.image('tiles', 'assets/images/tilemap.png')
+        this.load.image('tiles', 'assets/images/tilemap.png');
 
-        // Load Tile map
-        this.load.tilemapTiledJSON('testmap', 'assets/maps/test_map.json');
+        //PLACEHOLDER assets
+        this.load.image('PLACEHOLDERIMG', 'assets/images/thehi.jpg');
+        this.load.image('medkit', 'assets/images/tileMedkit.png');
+        this.load.image('armor', 'assets/images/tileArmor.png');
+        this.load.image('lever', 'assets/images/tileLever.png');
+
+        // Load Tile map from file
+        this.load.tilemapTiledJSON(this.fileName, `assets/maps/${this.fileName}.json`);
 
         // Hit sound
         this.load.audio('hit', 'assets/audio/hit.mp3');
@@ -70,7 +81,7 @@ export class GameScene extends Phaser.Scene {
         //Para dejar espacio visible de UI (600px de ventana - 16*32) 
         const TILEMAP_YOFFSET = 88;
         //crear mapa de tilemap, set de tiles y capa de tiles
-        const map = this.make.tilemap({key: 'testmap', tileWidth: 32, tileHeight: 32}); //1:nombre del archivo json, 2:tamaño de tile
+        const map = this.make.tilemap({key: this.fileName, tileWidth: 32, tileHeight: 32}); //1:nombre del archivo json, 2:tamaño de tile
         const tileset = map.addTilesetImage('tileset', 'tiles'); //1: nombre del tileset en el archivo, 2: nombre del asset de la imagen con los tiles
         
         this.terrainLayer = map.createLayer('terrainLayer', tileset, 0 , TILEMAP_YOFFSET); //1: nombre de la capa en el archivo,2: tileset, 3: las coordenadas en las que se empieza a dibujar
@@ -82,60 +93,28 @@ export class GameScene extends Phaser.Scene {
         //ocultar la capa para que no se puedan ver los tiles de guía
         entityLayer.setVisible(false);
 
+        //capa de objetos
+        const objectLayer = map.createLayer('objectLayer', tileset, 0, TILEMAP_YOFFSET);
+        objectLayer.setVisible(false);
 
-        //añadir grupo de físicas para los jugadores
-        this.playerGroup = this.physics.add.group();
-        this.spawnPlayers(entityLayer, this.terrainLayer);
-        
+        //Crear objetos de la escena
+        this.objectGroup = this.physics.add.group();
+        this.spawnObjects(objectLayer);
+
         //Crear array de enemigos
         this.enemies = []
         //añadir grupo de físicas para poder manejar a muchos enemigos
         this.enemyGroup = this.physics.add.group();
         this.spawnEnemies(entityLayer);
 
-        //Crear objetos de la escena
-        // por ahora un poco desorganizado a ver como lo podemos limpiar usando el tilset
-        this.sceneObjects = this.physics.add.group();
-        let newObject = new PickableObject(
-            this, 'medPack1', 32*10, 32*15, 'PLACEHOLDERIMG', 'medPack'
-        );
-        newObject.sprite.setTint(0x00FF00);
-        this.sceneObjects.add(newObject.sprite);
-        newObject = new PickableObject(
-            this, 'medPack2', 32*10, 32*16, 'PLACEHOLDERIMG', 'medPack'
-        );
-        newObject.sprite.setTint(0x00FF00);
-        this.sceneObjects.add(newObject.sprite);
-        newObject = new PickableObject(
-            this, 'medPack3', 32*10, 32*17, 'PLACEHOLDERIMG', 'medPack'
-        );
-        newObject.sprite.setTint(0x00FF00);
-        this.sceneObjects.add(newObject.sprite);
-        newObject = new PickableObject(
-            this, 'medPack4', 32*11, 32*15, 'PLACEHOLDERIMG', 'medPack'
-        );
-        newObject.sprite.setTint(0x00FF00);
-        this.sceneObjects.add(newObject.sprite);
-        newObject = new PickableObject(
-            this, 'medPack5', 32*11, 32*16, 'PLACEHOLDERIMG', 'medPack'
-        );
-        newObject.sprite.setTint(0x00FF00);
-        this.sceneObjects.add(newObject.sprite);
-        newObject = new PickableObject(
-            this, 'armourPiece1', 32*12, 32*15, 'PLACEHOLDERIMG', 'armourPiece'
-        );
-        newObject.sprite.setTint(0x8C8C8C);
-        this.sceneObjects.add(newObject.sprite);
-        newObject = new InteractableObject(
-            this, 'lever', 32*10, 32*10, 'PLACEHOLDERIMG', 500, 67
-        );
-        newObject.sprite.setTint(0xFFFF00);
-        this.sceneObjects.add(newObject.sprite);
+        //añadir grupo de físicas para los jugadores
+        this.playerGroup = this.physics.add.group();
+        this.spawnPlayers(entityLayer, this.terrainLayer);
 
         //collider entre enemigos y con el terreno
         this.physics.add.collider(this.enemyGroup, this.enemyGroup);
         this.physics.add.collider(this.enemyGroup, this.terrainLayer);
-        this.physics.add.collider(this.playerGroup, this.terrainLayer)
+        this.physics.add.collider(this.playerGroup, this.terrainLayer);
     }
 
     //lee de la capa de entidades del tilemap los los jugadores y los crea.
@@ -176,7 +155,7 @@ export class GameScene extends Phaser.Scene {
                     down: 'S',
                     left: 'A',
                     right: 'D',
-                    interact: ' ',
+                    interact: 'SPACE',
                     healSelf: 'Q',
                     healOther: 'F'
                 }, {
@@ -210,7 +189,45 @@ export class GameScene extends Phaser.Scene {
                 let enemy = new Enemy(this, x, y, this.pathfinder);
                 this.enemies.push(enemy);
                 //agregarlo al grupo de fisicas
-                this.enemyGroup.add(enemy.sprite)
+                this.enemyGroup.add(enemy.sprite);
+            }
+        });
+
+    }
+
+    spawnObjects(objectLayer) {
+
+        const LEVER_TILE_ID = 8;
+        const MEDKIT_TILE_ID = 9;
+        const ARMOR_TILE_ID = 10;
+
+        objectLayer.forEachTile(tile => {
+            if (tile.index === LEVER_TILE_ID) {
+                // centrar tile en coordenadas del mundo
+                const x = tile.getCenterX();
+                const y = tile.getCenterY();
+                //crear nuevo objeto
+                let newObject = new InteractableObject(this, undefined, x, y, 'lever', 500, 67);
+                //añadirlo a su grupo de físicas
+                this.objectGroup.add(newObject.sprite);
+            }
+            if (tile.index === MEDKIT_TILE_ID) {
+                // centrar tile en coordenadas del mundo
+                const x = tile.getCenterX();
+                const y = tile.getCenterY();
+                //crear nuevo objeto
+                let newObject = new PickableObject(this, undefined, x, y, 'medkit', 'medPack');
+                //añadirlo a su grupo de físicas
+                this.objectGroup.add(newObject.sprite);
+            }
+            if (tile.index === ARMOR_TILE_ID) {
+                // centrar tile en coordenadas del mundo
+                const x = tile.getCenterX();
+                const y = tile.getCenterY();
+                //crear nuevo objeto
+                let newObject = new PickableObject(this, undefined, x, y, 'armor', 'armourPiece');
+                //añadirlo a su grupo de físicas
+                this.objectGroup.add(newObject.sprite);
             }
         });
 
@@ -225,14 +242,15 @@ export class GameScene extends Phaser.Scene {
 
         this.player1.touchingFriend = playersTouching;
         this.player2.touchingFriend = playersTouching;
+
         // revisa colisiones con objetos interactuables:
         this.player1.interactingObject = null;
         this.player2.interactingObject = null;
         
-        this.physics.overlap(this.player1.sprite, this.sceneObjects, (p, o) => {
+        this.physics.overlap(this.player1.sprite, this.objectGroup, (p, o) => {
             this.player1.touchingObject(o.getData('sceneObject'));
         });
-        this.physics.overlap(this.player2.sprite, this.sceneObjects, (p, o) => {
+        this.physics.overlap(this.player2.sprite, this.objectGroup, (p, o) => {
             this.player2.touchingObject(o.getData('sceneObject'));
         });
          
@@ -241,9 +259,30 @@ export class GameScene extends Phaser.Scene {
         this.player2.update(delta);
         const players = [this.player1, this.player2];
         this.enemies.forEach(enemy => {enemy.update(time, players, delta)});
+
+        //testeo de cambio de niveles
+        if (this.enemies.length < 1) this.nextLevel();
     }
 
     handleEvents(id, player){
         console.log(player.id + ' ha tocado ' + id);
+        
     }
+
+    nextLevel() {
+    if (this.changingLevel) return; //para evitar llamar a la funcion varias veces
+    this.changingLevel = true;
+
+    const next = this.levelIndex + 1;
+
+    // transición al siguiente nivel
+    this.cameras.main.fadeOut(400, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+        if (next >= LEVELS.length) {
+            //si no quedan niveles, se vuelve a la escena principal (o la de creditos)
+            this.scene.start('MenuScene');
+        }
+        else this.scene.restart({ levelIndex: next });
+    });
+}
 }

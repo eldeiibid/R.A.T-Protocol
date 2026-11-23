@@ -3,11 +3,11 @@ export class Enemy {
 
     constructor (scene, x, y, pathfinder) {
         this.health = 10;
-        this.speed = 300;
+        this.speed = 100;
 
-        this.detectionRange = 300; //px
+        this.detectionRange = 200; //px
         this.attackRange = 30;
-        this.time2bite = 500; //sec
+        this.time2bite = 500; //ms
         
         this.target = null;
         this.repathInterval = 300; //ms
@@ -59,9 +59,8 @@ export class Enemy {
     chooseTarget(players, time) {
         if (this.target && this.target.lifeState === 'Alive') {
             const d = this.distanceTo(this.target);
-            if (d <= this.detectionRange ) return;
+            if (d <= this.detectionRange) return;
         }
-
 
         const previous = this.target;
         this.target = null;
@@ -76,7 +75,7 @@ export class Enemy {
             }
         }
 
-        //calcular camino tras un retraso aleatorio corto, no en este mismo frame
+        //volver a elegir objetivo tras un retraso aleatorio corto, no en este mismo frame
         if (this.target && this.target !== previous) {
             this.nextRepath = time + Phaser.Math.Between(0, this.repathInterval);
         }
@@ -88,7 +87,6 @@ export class Enemy {
             this.sprite.x, this.sprite.y, player.sprite.x, player.sprite.y
         );
     }
-
 
     move(delta) {
         // En rango de ataque: parar y atacar
@@ -111,7 +109,7 @@ export class Enemy {
         }
 
         //parar si ya ha llegado al destino o si el camino es muy largo
-        if (this.path.length === 0 || this.path.length * 32 > this.detectionRange) {
+        if (this.path.length === 0) {
             this.sprite.setVelocity(0, 0);
             return;
         }
@@ -143,5 +141,7 @@ export class Enemy {
         this.isAlive = false;
         this.sprite.body.enable = false;
         this.sprite.setActive(false);
+        this.sprite.destroy();
+        this.scene.enemies.pop();
     }
 }
