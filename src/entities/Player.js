@@ -4,7 +4,7 @@ export class Player {
 
     constructor(scene, id, controls) {
         this.health = 100;
-        this.armour = 100;
+        this.armour = 0;
         this.maxArmour = 100;
         this.wounds = 4;
         this.items = [null, null, null, null, null];
@@ -51,22 +51,23 @@ export class Player {
         let velocityX = 0;
         let velocityY = 0;
 
-        // Leer input
-        if (this.key.left.isDown) {
-            velocityX = -1;
-        }
+        //if (this.actionState === 'Idle' || 'Reloading') {
+            if (this.key.left.isDown) {
+                velocityX = -1;
+            }
 
-        if (this.key.right.isDown) {
-            velocityX = 1;
-        }
+            if (this.key.right.isDown) {
+                velocityX = 1;
+            }
 
-        if (this.key.up.isDown) {
-            velocityY = -1;
-        }
+            if (this.key.up.isDown) {
+                velocityY = -1;
+            }
 
-        if (this.key.down.isDown) {
-            velocityY = 1;
-        }
+            if (this.key.down.isDown) {
+                velocityY = 1;
+            }
+        //}
 
         // Aplicar velocidad
         this.sprite.setVelocity(
@@ -87,28 +88,29 @@ export class Player {
         if (this.health < this.wounds * 25 && this.hasItem('medPack')){
             this.health = Math.min(this.health + 25, this.wounds * 25);
             this.removeItem('medPack');
-            //console.log('im so green ' + this.health);
+            console.log(this.id + ' tiene: ' + this.health + ' de vida');
         } else if(this.armour < this.maxArmour && this.hasItem('armourPiece')){
             this.armour = Math.min(this.armour + 25, this.maxArmour);
             this.removeItem('armourPiece');
-            //console.log('im so grey ' + this.armour);
+            console.log(this.id + ' tiene ' + this.armour + ' de armor');
         }
     }
     cureFriend(player){        
         //primero revisa si la vida necesita curacion y si no cura la armadura
         if(player.lifeState === 'Downed'){
             player.health = player.wounds * 25;
+            console.log(this.id + ' ha revivido a ' + player.id + ' ,le quedan: ' + player.wounds + ' intentos.');
             return;
         }
 
         if (player.health < player.wounds * 25 && this.hasItem('medPack')){
             player.health = Math.min(player.health + 25, player.wounds * 25);
             this.removeItem('medPack');
-            console.log('im so green ' + player.health);
+            console.log(this.id + ' ha curado a ' + player.id);
         } else if(player.armour < player.maxArmour && this.hasItem('armourPiece')){
             player.armour = Math.min(player.armour + 25, player.maxArmour);
             this.removeItem('armourPiece');
-            console.log('im so grey ' + player.armour);
+            console.log(this.id + ' ha dado armor a ' + player.id);
         }
     }
 
@@ -124,7 +126,7 @@ export class Player {
                 this.health = 0;
             }
         }
-        console.log(this.id + ' vida: ' + this.health + 'armour:' + this.armour);
+        console.log(this.id + ' vida:' + this.health + ' armour:' + this.armour);
     }
 
     //Items:
@@ -159,21 +161,22 @@ export class Player {
     }
     
     interactWith(object, delta){
-        //console.log('paws at ' + object.id);
 
         //if (object.id === 'medPack' || object.id === 'armourPiece'){
         if(object instanceof PickableObject){
             object.interact(this);
+            console.log(this.id + ' recoge ' + object.id);
         }
         else {
             if(this.interactionProgress >= object.interactionTime){
+                //resetear el progreso
+                this.interactionProgress = 0;
                 object.activate(this);
             } else{
                 this.interactionProgress += delta;
             }
         }
     }
-
     //lifeState:
     //'Alive': esta vivo
     //'Downed': derribado, puede ser levantado pero pierde una wound
@@ -193,8 +196,9 @@ export class Player {
                 this.lifeState = 'Dead';
                 this.sprite.body.enable = false;
                 this.sprite.setActive(false);
-                this.sprite.setVisible(false);
+                this.sprite.destroy();
                 this.actionState = 'None';
+                console.log(this.id + " ha morido");
             } else {
                 if(this.lifeState === 'Alive'){
                     this.wounds--;
@@ -214,11 +218,30 @@ export class Player {
         } else if(this.reloading) {
             this.actionState = 'Reloading';
         } else if(this.interactionProgress != 0){
-            this.actionState = 'Interacting'
+            this.actionState = 'Interacting';
         } else {
             this.actionState = 'Idle';
         }
     }
 
+    //Guarda valores y devuelve valores importantes.
+    getSaveState() {
+        return {
+            health: this.health,
+            armour: this.armour,
+            wounds: this.wounds,
+            items: this.items
+        }
+    }
+
+    //Aplica los cambios de un guardado para cargarlos en transición de niveles.
+    applySaveState(save) {
+        if (!save) return;
+
+        this.health = save.health;
+        this.armour = save.armour;
+        this.wounds = save.wounds;
+        this.items = save.items;
+    }
     
 }

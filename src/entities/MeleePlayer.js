@@ -79,6 +79,7 @@ export class MeleePlayer extends Player {
         || (this.scene.player1.lifeState === 'Downed');
         if(this.key.healOther.isDown && this.touchingFriend
             && canCureFriend && (this.actionState === 'Idle' || this.actionState === 'HealingOther')){
+            this.sprite.setVelocity(0,0);
             this.healFriendProgress -= delta;
             if(this.healFriendProgress < 0){
                 super.cureFriend(this.scene.player1);
@@ -96,6 +97,7 @@ export class MeleePlayer extends Player {
         || ((this.armour < this.maxArmour) && this.hasItem('armourPiece'));
         if(this.key.healSelf.isDown
             && canCureSelf && (this.actionState === 'Idle' || this.actionState === 'HealingSelf')){
+            this.sprite.setVelocity(0,0);
             this.healSelfProgress -= delta;
             if(this.healSelfProgress < 0){
                 super.cureSelf();
@@ -107,6 +109,7 @@ export class MeleePlayer extends Player {
         
         if(this.key.interact.isDown && this.interactingObject != null &&
             (this.actionState === 'Idle' || this.actionState === 'Interacting')){
+            this.sprite.setVelocity(0,0);
             super.interactWith(this.interactingObject, delta);
         } else{
             this.interactionProgress = 0;

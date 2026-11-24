@@ -9,8 +9,9 @@ export class InteractableObject extends SceneObjects {
   }
 
   activate(player) {
-    this.scene.handleEvents(this.eventID, player);
-    this.sprite.body.enable = false;
-    this.sprite.setActive(false);
+    this.scene.handleEvents(this.id, player);
+    //comento esto para que se pueda intreractuar varias veces
+    //this.sprite.body.enable = false;
+    //this.sprite.setActive(false);
   }
 }

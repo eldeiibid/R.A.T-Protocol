@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
 export class Enemy {
 
-    constructor (scene, x, y, pathfinder) {
+    constructor (scene, id, x, y, pathfinder) {
         this.health = 10;
         this.speed = 100;
+        this.id = id;
 
         this.detectionRange = 200; //px
         this.attackRange = 30;
@@ -59,7 +60,7 @@ export class Enemy {
     chooseTarget(players, time) {
         if (this.target && this.target.lifeState === 'Alive') {
             const d = this.distanceTo(this.target);
-            if (d <= this.detectionRange) return;
+            if (d <= this.detectionRange * 1.25) return;
         }
 
         const previous = this.target;
@@ -124,26 +125,24 @@ export class Enemy {
     }
 
     attack(player) {
-        player.takeDamage(5);
+        player.takeDamage(10);
         this.time2bite = 500;
     }
 
     takeDamage(dmg, dir) {
-        let damageTaken = dmg - this.health;
         this.health = this.health - dmg;
         if(this.health < 0){
             this.health = 0;
             this.die();
         }
-        return damageTaken;
-        //console.log('enemy_ouch: ' + this.health);
+        console.log('enemy' + this.id + ' hp: ' + this.health);
     }
 
     die() {
         this.isAlive = false;
         this.sprite.body.enable = false;
         this.sprite.setActive(false);
-        //this.sprite.destroy();
+        this.sprite.destroy();
         this.scene.enemies.pop();
     }
 }

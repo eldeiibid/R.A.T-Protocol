@@ -22,6 +22,9 @@ export class GameScene extends Phaser.Scene {
         this.levelIndex = data?.levelIndex ?? 0;
         this.fileName = LEVELS[this.levelIndex];
         this.changingLevel = false;
+
+        //verifica si se ha pasado el estado de los jugadores al iniciar el nivel o si empiezan desde cero.
+        this.playerSaveState = data?.playerState ?? null;
     }
 
     preload() {
@@ -48,7 +51,9 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
-       
+        //Entrada con fundido guapo
+        this.cameras.main.fadeIn(200);
+
         // Looping background music, Silenciada temporalmente por que es un AI SLOP
         this.music = this.sound.add('music', { loop: true, volume: 0.0 });
         this.music.play();
@@ -64,7 +69,7 @@ export class GameScene extends Phaser.Scene {
 
         // Crea el tilemap/jugadores/enemigos
         this.setUpWorld();
-
+    
         // UI de los jugadores
         this.gameUI = new GameUI(this);
 
@@ -105,16 +110,24 @@ export class GameScene extends Phaser.Scene {
         this.enemies = []
         //añadir grupo de físicas para poder manejar a muchos enemigos
         this.enemyGroup = this.physics.add.group();
+        //spawnear a los enemigos
         this.spawnEnemies(entityLayer);
 
         //añadir grupo de físicas para los jugadores
         this.playerGroup = this.physics.add.group();
+        //spawnear a los jugadores
         this.spawnPlayers(entityLayer, this.terrainLayer);
+        //Crear array de jugadores
+        this.playerArray = [this.player1, this.player2];
+        //Y cargar sus estados guardados (en caso de que los haya)
+        this.loadPlayerState();
 
         //collider entre enemigos y con el terreno
         this.physics.add.collider(this.enemyGroup, this.enemyGroup);
         this.physics.add.collider(this.enemyGroup, this.terrainLayer);
         this.physics.add.collider(this.playerGroup, this.terrainLayer);
+        //testeo
+        //this.physics.add.collider(this.playerGroup, this.enemyGroup);
     }
 
     //lee de la capa de entidades del tilemap los los jugadores y los crea.
@@ -125,6 +138,8 @@ export class GameScene extends Phaser.Scene {
         const MELEE_TILE_ID = 6;
         let meleePlayerFound = false
         let rangePlayerFound = false
+
+        
 
         entityLayer.forEachTile(tile => {
             if (tile.index === RANGE_TILE_ID && !rangePlayerFound) {
@@ -179,14 +194,14 @@ export class GameScene extends Phaser.Scene {
 
         // id del tile en el json
         const TILE_ID = 7;
-        
+        let id = 0;
         entityLayer.forEachTile(tile => {
             if (tile.index === TILE_ID) {
                 // centrar tile en coordenadas del mundo
                 const x = tile.getCenterX();
                 const y = tile.getCenterY();
                 //crear nuevo enemigo
-                let enemy = new Enemy(this, x, y, this.pathfinder);
+                let enemy = new Enemy(this, id++, x, y, this.pathfinder);
                 this.enemies.push(enemy);
                 //agregarlo al grupo de fisicas
                 this.enemyGroup.add(enemy.sprite);
@@ -207,7 +222,7 @@ export class GameScene extends Phaser.Scene {
                 const x = tile.getCenterX();
                 const y = tile.getCenterY();
                 //crear nuevo objeto
-                let newObject = new InteractableObject(this, undefined, x, y, 'lever', 500, 67);
+                let newObject = new InteractableObject(this, 'finish_level', x, y, 'lever', 1000, 1);
                 //añadirlo a su grupo de físicas
                 this.objectGroup.add(newObject.sprite);
             }
@@ -216,7 +231,7 @@ export class GameScene extends Phaser.Scene {
                 const x = tile.getCenterX();
                 const y = tile.getCenterY();
                 //crear nuevo objeto
-                let newObject = new PickableObject(this, undefined, x, y, 'medkit', 'medPack');
+                let newObject = new PickableObject(this, 'medkit', x, y, 'medkit', 'medPack');
                 //añadirlo a su grupo de físicas
                 this.objectGroup.add(newObject.sprite);
             }
@@ -225,10 +240,20 @@ export class GameScene extends Phaser.Scene {
                 const x = tile.getCenterX();
                 const y = tile.getCenterY();
                 //crear nuevo objeto
-                let newObject = new PickableObject(this, undefined, x, y, 'armor', 'armourPiece');
+                let newObject = new PickableObject(this, 'armor', x, y, 'armor', 'armourPiece');
                 //añadirlo a su grupo de físicas
                 this.objectGroup.add(newObject.sprite);
             }
+        });
+
+    }
+
+    //cargar estado de guardado de los jugadores y aplicarlos
+    loadPlayerState () {
+        if (!this.playerSaveState) return;
+
+        this.playerArray.forEach(p => {
+            p.applySaveState(this.playerSaveState[p.id]);
         });
 
     }
@@ -257,33 +282,49 @@ export class GameScene extends Phaser.Scene {
         // actualiza los jugadores
         this.player1.update(delta);
         this.player2.update(delta);
-        const players = [this.player1, this.player2];
-        this.enemies.forEach(enemy => {enemy.update(time, players, delta)});
-
-        //testeo de cambio de niveles
-        if (this.enemies.length < 1) this.loadNextLevel();
+        this.enemies.forEach(enemy => {enemy.update(time, this.playerArray, delta)});
+        
         // actualiza UI
         this.gameUI.update();
+
+        //testeo de cambio de niveles
+        //if (this.enemies.length < 1) this.loadNextLevel();
     }
 
+    //Manejar los eventos de los objetos interactuables (por ahora sólo la palanca)
     handleEvents(id, player){
-        console.log(player.id + ' ha tocado ' + id);
+        //testeo de cambio de niveles
+        console.log(player.id + ' ha movido la palanca: ' + id);
+        //los dos la tienen que estar cerca (tocándose) y vivos.
+        if (this.player1.touchingFriend) {
+            if (this.player1.lifeState === 'Alive' && this.player2.lifeState === 'Alive') {
+                this.loadNextLevel();
+                console.log("se cumplen las condiciones: siguiente nivel..");
+            }
+
+        }
     }
 
     loadNextLevel() {
-    if (this.changingLevel) return; //para evitar llamar a la funcion varias veces
-    this.changingLevel = true;
+        if (this.changingLevel) return; //para evitar llamar a la funcion varias veces
+        this.changingLevel = true;
 
-    const next = this.levelIndex + 1;
+        const next = this.levelIndex + 1;
 
-    // transición al siguiente nivel
-    this.cameras.main.fadeOut(400, 0, 0, 0);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-        if (next >= LEVELS.length) {
-            //si no quedan niveles, se vuelve a la escena principal (o la de creditos)
-            this.scene.start('MenuScene');
-        }
-        else this.scene.restart({ levelIndex: next });
-    });
-}
+        // guardar el estado de los jugadores para pasarlos al reiniciar.
+        const playerState = {};
+        this.playerArray.forEach(p => {
+            playerState[p.id] = p.getSaveState();
+        });
+
+        // transición al siguiente nivel
+        this.cameras.main.fadeOut(400, 0, 0, 0);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+            if (next >= LEVELS.length) {
+                //si no quedan niveles, se vuelve a la escena principal (o la de creditos)
+                this.scene.start('MenuScene');
+            }
+            else this.scene.restart({ levelIndex: next, playerState });
+        });
+    }
 }
