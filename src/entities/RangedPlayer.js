@@ -11,7 +11,7 @@ export class RangedPlayer extends Player {
         this.sprite.setImmovable(false);
         this.sprite.setCollideWorldBounds(true);
 
-        this.cooldownZero = 50;
+        this.cooldownZero = 100;
         this.cooldown = this.cooldownZero;
         this.maxAmmo = 100;
         this.ammo = this.maxAmmo;

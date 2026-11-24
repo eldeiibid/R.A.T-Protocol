@@ -2,18 +2,17 @@ import Phaser from 'phaser';
 export class Enemy {
 
     constructor (scene, id, x, y, pathfinder) {
-        this.health = 10;
-        this.speed = 150;
+        this.health = 100;
+        this.speed = 100;
         this.id = id;
 
-        this.detectionRange = 300; //px
+        this.detectionRange = 200; //px
         this.attackRange = 30;
         this.time2bite = 500; //ms
         
         this.target = null;
         this.repathInterval = 300; //ms
         this.path = []
-        //
         this.nextRepath = 0;
 
         this.scene = scene;
@@ -31,29 +30,26 @@ export class Enemy {
     }
 
     update(time, players, delta) {
-        if(this.isAlive){
-            this.chooseTarget(players, time);
+        if (!this.isAlive) return;
 
-            if (!this.target) {
-                this.path = [];
-                this.sprite.setVelocity(0, 0);
-                return;
-            }
+        this.chooseTarget(players, time);
 
-            // Recalcular el camino cada cierto tiempo, no cada frame
-            if (time >= this.nextRepath) {
-                // se calcula añade una pequeña variación al intervalo de calculo de path para evitar que todos se muevan a la vez
-                this.nextRepath = time + this.repathInterval + Phaser.Math.Between(-50, 50);
-                this.path = this.pathfinder.findPath(
-                    this.sprite.x, this.sprite.y,
-                    this.target.sprite.x, this.target.sprite.y
-                ) || [];
-            }
-
-            this.move(delta);
-        } else {
-            //por si se quiere implementar algo para cuando este muerto
+        if (!this.target) {
+            // sin objetivo: termina el camino que llevaba (última posición conocida) y se para
+            this.followPath();
+            return;
         }
+
+        if (time >= this.nextRepath) {
+            this.nextRepath = time + this.repathInterval + Phaser.Math.Between(-50, 50);
+            const newPath = this.pathfinder.findPath(
+                this.sprite.x, this.sprite.y,
+                this.target.sprite.x, this.target.sprite.y
+            );
+            
+            if (newPath) this.path = newPath;
+        }
+        this.move(delta);
     }
 
     // Elige al jugador vivo más cercano dentro del rango.
@@ -90,37 +86,53 @@ export class Enemy {
     }
 
     move(delta) {
-        // En rango de ataque: parar y atacar
-        if (this.distanceTo(this.target) <= this.attackRange) {
+        const d = this.distanceTo(this.target);
+
+        // En rango de ataque: parar, mirar al objetivo y morder
+        if (d <= this.attackRange) {
             this.sprite.setVelocity(0, 0);
-            if(this.time2bite <= 0){
+            this.sprite.rotation = Phaser.Math.Angle.Between(
+                this.sprite.x, this.sprite.y,
+                this.target.sprite.x, this.target.sprite.y
+            );
+            if (this.time2bite <= 0) {
                 this.attack(this.target);
-            } else{
+            } else {
                 this.time2bite -= delta;
             }
             return;
-
         }
 
-        // Descartar waypoints ya alcanzados
+        if (this.followPath()) return;
+
+        // Sin waypoints pero cerca (mismo tile que el jugador): ir directo, es seguro
+        if (d < this.pathfinder.tileW * 1.5) {
+            this.moveToward(this.target.sprite.x, this.target.sprite.y);
+        } else {
+            this.sprite.setVelocity(0, 0);
+        }
+    }
+
+    // Sigue los waypoints. Devuelve false si no queda ninguno.
+    followPath() {
         while (this.path.length > 0 &&
-               Phaser.Math.Distance.Between(
-                   this.sprite.x, this.sprite.y, this.path[0].x, this.path[0].y) < 4) {
+            Phaser.Math.Distance.Between(
+                this.sprite.x, this.sprite.y, this.path[0].x, this.path[0].y) < 4) {
             this.path.shift();
         }
 
-        //parar si ya ha llegado al destino o si el camino es muy largo
         if (this.path.length === 0) {
             this.sprite.setVelocity(0, 0);
-            return;
+            return false;
         }
 
-        const next = this.path[0];
-        const angle = Math.atan2(next.y - this.sprite.y, next.x - this.sprite.x);
-        this.sprite.setVelocity(
-            Math.cos(angle) * this.speed,
-            Math.sin(angle) * this.speed
-        );
+        this.moveToward(this.path[0].x, this.path[0].y);
+        return true;
+    }
+
+    moveToward(x, y) {
+        const angle = Math.atan2(y - this.sprite.y, x - this.sprite.x);
+        this.sprite.setVelocity(Math.cos(angle) * this.speed, Math.sin(angle) * this.speed);
         this.sprite.rotation = angle;
     }
 
@@ -129,13 +141,30 @@ export class Enemy {
         this.time2bite = 500;
     }
 
-    takeDamage(dmg, dir) {
+    takeDamage(dmg) {
         this.health = this.health - dmg;
+        this.cooldownTime = 100;
+
         if(this.health <= 0){
             this.health = 0;
             this.die();
         }
+        this.flashDamage();
         console.log('enemy' + this.id + ' hp: ' + this.health);
+
+    }
+
+    //flasheo al recibir daño
+    flashDamage(duration = 100) {
+        this.sprite.setTintFill(0xcc0000); //rojo
+
+        // Si recibe otro golpe durante el flasheo, reiniciar temporizador
+        if (this.flashTimer) this.flashTimer.remove(false);
+
+        this.flashTimer = this.scene.time.delayedCall(duration, () => {
+            if (this.sprite && this.sprite.active) this.sprite.clearTint();
+            this.flashTimer = null;
+        });
     }
 
     die() {

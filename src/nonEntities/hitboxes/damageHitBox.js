@@ -1,4 +1,3 @@
-import Phaser from 'phaser';
 export class damageHitBox{
     constructor(scene, origin, duration){
         this.scene = scene;
@@ -14,6 +13,11 @@ export class damageHitBox{
     }
 
     destroy() {
+        if (this.timer) this.timer.remove(false);
+        if (this.collider) {
+            this.collider.destroy();
+            this.collider = null;
+        }
         if (this.sprite) {
             this.sprite.destroy();
             this.sprite = null;

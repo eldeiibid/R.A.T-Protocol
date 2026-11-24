@@ -33,6 +33,7 @@ export class GameScene extends Phaser.Scene {
         this.load.image('meleePlayer', 'assets/images/meleePlayer.png');
         this.load.image('enemy', 'assets/images/enemy.png');
         this.load.image('tiles', 'assets/images/tilemap.png');
+        this.load.image('inventory', 'assets/images/inventory.png');
 
         //PLACEHOLDER assets
         this.load.image('PLACEHOLDERIMG', 'assets/images/thehi.jpg');

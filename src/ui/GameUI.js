@@ -34,27 +34,21 @@ export class GameUI {
 
         this.P1Inventory = this.scene.add.sprite(
             20, 40,
-            'PLACEHOLDERIMG'
+            'inventory'
         );
         this.P1Inventory.setOrigin(0, 0);
-        this.P1Inventory.displayHeight = 40;
-        this.P1Inventory.displayWidth = 200;
-        this.P1Inventory.setTint(0x8C8C8C);
         this.P1Inventory.items = [null,null,null,null,null];
         for(var i = 0; i < 5; i++){
-            this.P1Inventory.items[i] = new UIElement(this.scene, this.P1Inventory.x + 40*i + 4,this.P1Inventory.y + 4, 'PLACEHOLDERIMG');
+            this.P1Inventory.items[i] = new UIElement(this.scene, this.P1Inventory.x + 40*i + 4,this.P1Inventory.y + 4);
         }
         this.P2Inventory = this.scene.add.sprite(
             580, 40,
-            'PLACEHOLDERIMG'
+            'inventory'
         );
         this.P2Inventory.setOrigin(0, 0);
-        this.P2Inventory.displayHeight = 40;
-        this.P2Inventory.displayWidth = 200;
-        this.P2Inventory.setTint(0x8C8C8C);
         this.P2Inventory.items = [null,null,null,null,null];
         for(var i = 0; i < 5; i++){
-            this.P2Inventory.items[i] = new UIElement(this.scene, this.P2Inventory.x + 40*i,this.P1Inventory.y, 'PLACEHOLDERIMG');
+            this.P2Inventory.items[i] = new UIElement(this.scene, this.P2Inventory.x + 40*i + 4,this.P1Inventory.y + 4);
         }
         
         this.P1Ammo = this.scene.add.text(
@@ -106,11 +100,9 @@ export class GameUI {
         for(var i = 0; i < this.P1Inventory.items.length; i++){
             if(this.player1.items[i] === 'medPack'){
                 this.P1Inventory.items[i].setSprite('medkit');
-                this.P1Inventory.items[i].element.setTint(0x00FF00);
                 this.P1Inventory.items[i].turnOn(true);
             } else if(this.player1.items[i] === 'armourPiece'){
                 this.P1Inventory.items[i].setSprite('armor');
-                this.P1Inventory.items[i].element.setTint(0x4D4D4D);
                 this.P1Inventory.items[i].turnOn(true);
             } else {
                 this.P1Inventory.items[i].turnOn(false);
@@ -119,11 +111,9 @@ export class GameUI {
         for(var i = 0; i < this.P2Inventory.items.length; i++){
             if(this.player2.items[i] === 'medPack'){
                 this.P2Inventory.items[i].setSprite('medkit');
-                this.P2Inventory.items[i].element.setTint(0x00FF00);
                 this.P2Inventory.items[i].turnOn(true);
             } else if(this.player2.items[i] === 'armourPiece'){
                 this.P2Inventory.items[i].setSprite('armor');
-                this.P2Inventory.items[i].element.setTint(0x4D4D4D);
                 this.P2Inventory.items[i].turnOn(true);
             } else {
                 this.P2Inventory.items[i].turnOn(false);
