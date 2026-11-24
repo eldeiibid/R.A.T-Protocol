@@ -139,8 +139,6 @@ export class GameScene extends Phaser.Scene {
         let meleePlayerFound = false
         let rangePlayerFound = false
 
-        
-
         entityLayer.forEachTile(tile => {
             if (tile.index === RANGE_TILE_ID && !rangePlayerFound) {
                 // centrar tile en coordenadas del mundo
@@ -289,22 +287,35 @@ export class GameScene extends Phaser.Scene {
 
         //testeo de cambio de niveles
         //if (this.enemies.length < 1) this.loadNextLevel();
+        this.checkGameOver();
     }
 
+    //Condición de victoria
     //Manejar los eventos de los objetos interactuables (por ahora sólo la palanca)
     handleEvents(id, player){
+
         //testeo de cambio de niveles
         console.log(player.id + ' ha movido la palanca: ' + id);
-        //los dos la tienen que estar cerca (tocándose) y vivos.
+        //los dos tienen que estar cerca (tocándose) y vivos.
+        /*
         if (this.player1.touchingFriend) {
-            if (this.player1.lifeState === 'Alive' && this.player2.lifeState === 'Alive') {
+            if (this.player1.lifeState !== 'Downed' || this.player2.lifeState !== 'Downed') {
                 this.loadNextLevel();
                 console.log("se cumplen las condiciones: siguiente nivel..");
             }
 
         }
+        */
+        this.loadNextLevel();
     }
 
+    //Condición de derrota
+    checkGameOver() {
+        if (this.player1.lifeState !== 'Alive' && this.player2.lifeState !== 'Alive') 
+            this.loadScene('MenuScene', 2000, 200); //1: nombre de la escena, 2: tiempo de transición 3,4,5: nivel de color RGB de transición
+    }
+    
+    //refactorizar para: recibir una variable q indique si cargar un nivel o escena, tiempo de fadeout
     loadNextLevel() {
         if (this.changingLevel) return; //para evitar llamar a la funcion varias veces
         this.changingLevel = true;
@@ -325,6 +336,17 @@ export class GameScene extends Phaser.Scene {
                 this.scene.start('MenuScene');
             }
             else this.scene.restart({ levelIndex: next, playerState });
+        });
+    }
+
+    //lamar a cualquier otra escena (útil para la pantalla de gameOver o victoria)
+    loadScene(sceneName, transitionTime, R, G, B) {
+        if (this.onAnimation) return; //para evitar llamar a la funcion varias veces
+        this.onAnimation = true;
+
+        this.cameras.main.fadeOut(transitionTime, R, G, B);
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.scene.start(sceneName);
         });
     }
 }

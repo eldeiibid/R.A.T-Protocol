@@ -1,4 +1,3 @@
-import Phaser from "phaser";
 import { UIElement } from "./UIElement";
 
 export class GameUI {
