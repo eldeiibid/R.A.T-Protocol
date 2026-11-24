@@ -3,10 +3,10 @@ export class Enemy {
 
     constructor (scene, id, x, y, pathfinder) {
         this.health = 10;
-        this.speed = 100;
+        this.speed = 150;
         this.id = id;
 
-        this.detectionRange = 200; //px
+        this.detectionRange = 300; //px
         this.attackRange = 30;
         this.time2bite = 500; //ms
         
@@ -47,7 +47,7 @@ export class Enemy {
                 this.path = this.pathfinder.findPath(
                     this.sprite.x, this.sprite.y,
                     this.target.sprite.x, this.target.sprite.y
-                );
+                ) || [];
             }
 
             this.move(delta);
@@ -60,7 +60,7 @@ export class Enemy {
     chooseTarget(players, time) {
         if (this.target && this.target.lifeState === 'Alive') {
             const d = this.distanceTo(this.target);
-            if (d <= this.detectionRange * 1.25) return;
+            if (d <= this.detectionRange) return;
         }
 
         const previous = this.target;
@@ -131,7 +131,7 @@ export class Enemy {
 
     takeDamage(dmg, dir) {
         this.health = this.health - dmg;
-        if(this.health < 0){
+        if(this.health <= 0){
             this.health = 0;
             this.die();
         }
@@ -143,6 +143,5 @@ export class Enemy {
         this.sprite.body.enable = false;
         this.sprite.setActive(false);
         this.sprite.destroy();
-        this.scene.enemies.pop();
     }
 }

@@ -128,7 +128,6 @@ export class Player {
         }
         console.log(this.id + ' vida:' + this.health + ' armour:' + this.armour);
     }
-
     //Items:
     // medPack
     // armourPiece
@@ -196,9 +195,8 @@ export class Player {
                 this.lifeState = 'Dead';
                 this.sprite.body.enable = false;
                 this.sprite.setActive(false);
-                this.sprite.destroy();
+                //this.sprite.destroy();
                 this.actionState = 'None';
-                console.log(this.id + " ha morido");
             } else {
                 if(this.lifeState === 'Alive'){
                     this.wounds--;
@@ -230,7 +228,8 @@ export class Player {
             health: this.health,
             armour: this.armour,
             wounds: this.wounds,
-            items: this.items
+            items: this.items,
+            lifeState: this.lifeState
         }
     }
 
@@ -242,6 +241,7 @@ export class Player {
         this.armour = save.armour;
         this.wounds = save.wounds;
         this.items = save.items;
+        this.lifeState = save.lifeState;
     }
     
 }
