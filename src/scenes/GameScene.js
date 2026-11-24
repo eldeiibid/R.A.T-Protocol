@@ -90,7 +90,7 @@ export class GameScene extends Phaser.Scene {
         const tileset = map.addTilesetImage('tileset', 'tiles'); //1: nombre del tileset en el archivo, 2: nombre del asset de la imagen con los tiles
         
         this.terrainLayer = map.createLayer('terrainLayer', tileset, 0 , TILEMAP_YOFFSET); //1: nombre de la capa en el archivo,2: tileset, 3: las coordenadas en las que se empieza a dibujar
-        this.terrainLayer.setCollisionBetween(2, 3); //id de los tiles en el archivo
+        this.terrainLayer.setCollisionBetween(11, 33); //id de los tiles en el archivo
         //Pathfinder para detectar el terreno
         this.pathfinder = new Pathfinder(this.terrainLayer); 
         
