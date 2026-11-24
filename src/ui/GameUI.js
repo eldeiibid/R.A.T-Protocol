@@ -62,12 +62,29 @@ export class GameUI {
             220, 10,
             this.player1.ammo
         );
+
+        this.P1Interaction = this.scene.add.rectangle(
+            250, 80,
+            40, 40,
+            0xffffff
+        );
+        this.P1Interaction.setOrigin(0.5, 0);
+        this.P1Interaction.setVisible(false);
+
+        this.P2Interaction = this.scene.add.rectangle(
+            550, 80,
+            40, 40,
+            0xffffff
+        );
+        this.P2Interaction.setOrigin(0.5, 0);
+        this.P2Interaction.setVisible(false);
     }
 
     update(){
         this.updateHealth();
         this.updateAmmo();
         this.updateItems();
+        this.updateInteract();
     }
 
     updateHealth(){
@@ -122,5 +139,51 @@ export class GameUI {
         this.P1Ammo.setText(this.player1.ammo);
 
         }
+    }
+
+    updateInteract(){
+        let progress;
+
+        switch(this.player1.actionState){
+            case 'Interacting':
+                this.P1Interaction.setVisible(true);
+                progress = -(this.player1.interactionProgress + 1) / (this.player1.interactingObject.interactionTime+1);
+                this.P1Interaction.height = 40 * progress;
+                break;
+            case 'HealingSelf':
+                this.P1Interaction.setVisible(true);
+                progress = -((2500) - (this.player1.healSelfProgress) + 1) / (2500+1);
+                this.P1Interaction.height = 40 * progress;
+                break;
+            case 'HealingOther':
+                this.P1Interaction.setVisible(true);
+                progress = -((1500) - (this.player1.healFriendProgress) + 1) / (1500+1);
+                this.P1Interaction.height = 40 * progress;
+                break;
+            default:
+                this.P1Interaction.setVisible(false);
+                break;
+        };
+
+        switch(this.player2.actionState){
+            case 'Interacting':
+                this.P2Interaction.setVisible(true);
+                progress = -(this.player2.interactionProgress + 1) / (this.player2.interactingObject.interactionTime+1);
+                this.P2Interaction.height = 40 * progress;
+                break;
+            case 'HealingSelf':
+                this.P2Interaction.setVisible(true);
+                progress = -((2500) - (this.player2.healSelfProgress) + 1) / (2500+1);
+                this.P2Interaction.height = 40 * progress;
+                break;
+            case 'HealingOther':
+                this.P2Interaction.setVisible(true);
+                progress = -((1500) - (this.player2.healFriendProgress) + 1) / (1500+1);
+                this.P2Interaction.height = 40 * progress;
+                break;
+            default:
+                this.P2Interaction.setVisible(false);
+                break;
+        };
     }
 }

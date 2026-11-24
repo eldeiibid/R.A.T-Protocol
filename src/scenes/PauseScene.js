@@ -27,5 +27,13 @@ export class PauseScene extends Phaser.Scene {
                 this.scene.stop('GameScene');
                 this.scene.start('MenuScene');
             });
+        const GuideBtn = this.add.text(400, 360, 'How to play', { fontSize: '32px', color: '#00ff00' }).setOrigin(0.5)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerover', () => GuideBtn.setStyle({ color: '#ffff00' }))
+            .on('pointerout', () => GuideBtn.setStyle({ color: '#00ff00' }))
+            .on('pointerdown', () => {
+                this.scene.stop();
+                this.scene.start('GuideScene');
+            });
     }
 }

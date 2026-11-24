@@ -217,7 +217,8 @@ export class Player {
             this.actionState = 'HealingSelf';
         } else if(this.reloading) {
             this.actionState = 'Reloading';
-        } else if(this.interactionProgress != 0){
+
+        } else if(this.interactionProgress != 0 && this.interactingObject != null){
             this.actionState = 'Interacting';
         } else {
             this.actionState = 'Idle';
