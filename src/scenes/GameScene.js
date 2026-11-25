@@ -7,7 +7,7 @@ import { InteractableObject } from '../objects/InteractableObject';
 import { Pathfinder } from '../lib/Pathfinder';
 import { GameUI } from '../ui/GameUI';
 
-const LEVELS = ['test_map', 'test2'];
+const LEVELS = ['level1', 'level2', 'level3', 'level4', 'level5'];
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -34,8 +34,8 @@ export class GameScene extends Phaser.Scene {
         this.load.image('enemy', 'assets/images/enemy.png');
         this.load.image('tiles', 'assets/images/tilemap.png');
         this.load.image('inventory', 'assets/images/inventory.png');
-        this.load.image('redPistol', 'assets/images/redPistol.png');
-        this.load.image('blueBat', 'assets/images/blueBat.png');
+        this.load.image('redBat', 'assets/images/redBat.png');
+        this.load.image('bluePistol', 'assets/images/bluePistol.png');
         this.load.image('meleeHit', 'assets/images/meleeHit.png');
         this.load.image('medkit', 'assets/images/itemMedkit.png');
         this.load.image('armor', 'assets/images/itemArmor.png');
@@ -67,7 +67,7 @@ export class GameScene extends Phaser.Scene {
         //Entrada con fundido guapo
         this.cameras.main.fadeIn(200);
 
-        // Looping background music, Silenciada temporalmente por que es un AI SLOP
+        // Looping background music, Silenciada temporalmente
         this.music = this.sound.add('music', { loop: true, volume: 0.0 });
         this.music.play();
 

@@ -14,20 +14,20 @@ export class MenuScene extends Phaser.Scene {
 
         const localBtn = this.add.text(400, 320, 'Local Play', {
             fontSize: '32px',
-            color: '#00ff00'
+            color: 'red'
         }).setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerover', () => localBtn.setStyle({ color: '#ffff00' }))
-            .on('pointerout', () => localBtn.setStyle({ color: '#00ff00' }))
+            .on('pointerout', () => localBtn.setStyle({ color: 'red' }))
             .on('pointerdown', () => this.scene.start('GameScene', {levelIndex: 0}));
 
         const creditBtn = this.add.text(400, 400, 'Credits', {
             fontSize: '32px',
-            color: '#ffffff'
+            color: 'red'
         }).setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerover', () => creditBtn.setStyle({ color: '#ffff00' }))
-            .on('pointerout', () => creditBtn.setStyle({ color: '#ffffff' }))
+            .on('pointerout', () => creditBtn.setStyle({ color: 'red' }))
             .on('pointerdown', () => this.scene.start('CreditScene'));
     }
 }

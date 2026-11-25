@@ -12,9 +12,9 @@ export class GameUI {
             {color: 'yellow'}
         );
 
-        this.P1Weapon = new UIElement(this.scene, 225, 0, 'redPistol');
+        this.P1Weapon = new UIElement(this.scene, 225, 0, 'bluePistol');
 
-        this.P2Weapon = new UIElement(this.scene, 500, 0, 'blueBat');
+        this.P2Weapon = new UIElement(this.scene, 500, 0, 'redBat');
 
         this.P1Ammo = this.scene.add.text(
             265, 45,
@@ -76,12 +76,12 @@ export class GameUI {
         );
 
         this.P1State = this.scene.add.text(
-            45, 42,
+            45, 45,
             this.player1.actionState
         );
 
         this.P2State = this.scene.add.text(
-            605, 42,
+            605, 45,
             this.player2.actionState
         );
 
