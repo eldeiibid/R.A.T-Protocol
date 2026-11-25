@@ -1,3 +1,4 @@
+import { InteractableObject } from "../objects/InteractableObject";
 import { PickableObject } from "../objects/PickableObject";
 
 export class Player {
@@ -177,12 +178,11 @@ export class Player {
     
     interactWith(object, delta){
 
-        //if (object.id === 'medPack' || object.id === 'armourPiece'){
         if(object instanceof PickableObject){
             object.interact(this);
             console.log(this.id + ' recoge ' + object.id);
         }
-        else {
+        else if(object instanceof InteractableObject){
             if(this.interactionProgress >= object.interactionTime){
                 //resetear el progreso
                 this.interactionProgress = 0;

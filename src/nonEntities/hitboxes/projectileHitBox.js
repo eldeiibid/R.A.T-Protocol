@@ -8,6 +8,7 @@ export class projectileHitBox extends damageHitBox{
         this.sprite = scene.physics.add.sprite(origin.sprite.x, origin.sprite.y, 'bullet');
         this.sprite.setDisplaySize(12, 12);
         this.sprite.setCollideWorldBounds(false);
+        this.sprite.setTint(0xFFEF00);
         
         this.damage = 10;
         const mod = Math.hypot(direction.x, direction.y);

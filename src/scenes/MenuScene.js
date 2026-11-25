@@ -4,12 +4,13 @@ export class MenuScene extends Phaser.Scene {
     constructor() {
         super('MenuScene');
     }
+    preload() {
+        this.load.image('logo', 'assets/images/logo.png');
+    }
 
     create() {
-        this.add.text(400, 150, 'R.A.T Protocol', {
-            fontSize: '64px',
-            color: '#ffffff'
-        }).setOrigin(0.5);
+        this.title = this.add.image(400,150, 'logo').setOrigin(0.5);
+        this.title.setScale(0.25);
 
         const localBtn = this.add.text(400, 320, 'Local Play', {
             fontSize: '32px',

@@ -37,14 +37,21 @@ export class GameScene extends Phaser.Scene {
         this.load.image('redPistol', 'assets/images/redPistol.png');
         this.load.image('blueBat', 'assets/images/blueBat.png');
         this.load.image('meleeHit', 'assets/images/meleeHit.png');
+        this.load.image('medkit', 'assets/images/itemMedkit.png');
+        this.load.image('armor', 'assets/images/itemArmor.png');
+        this.load.image('lever', 'assets/images/tileLeverOn.png')
+        this.load.image('rangeHeal', 'assets/images/Fox/curarsefo.png');
+        this.load.image('rangeInteract', 'assets/images/Fox/interactuarfo.png');
+        this.load.image('meleeHeal', 'assets/images/Fox/curarseowl.png');
+        this.load.image('rangeInteract', 'assets/images/Fox/interactuarowl.png');
 
 
 
         //PLACEHOLDER assets
-        this.load.image('bullet', 'assets/images/bullet.png');
-        this.load.image('medkit', 'assets/images/tileMedkit.png');
-        this.load.image('armor', 'assets/images/tileArmor.png');
-        this.load.image('lever', 'assets/images/tileLever.png');
+        this.load.image('bullet', 'assets/images/otherBullet.png');
+        //this.load.image('medkit', 'assets/images/tileMedkit.png');
+        //this.load.image('armor', 'assets/images/tileArmor.png');
+        //this.load.image('lever', 'assets/images/tileLever.png');
 
         // Load Tile map from file
         this.load.tilemapTiledJSON(this.fileName, `assets/maps/${this.fileName}.json`);
