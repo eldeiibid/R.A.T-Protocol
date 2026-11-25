@@ -48,4 +48,4 @@ Apartados principales:
 
 ---
 
-[Presentación](https://docs.google.com/presentation/d/1MwmwgLwlIVrX6K134yq0h7a6wDkHj4Yc4Tm2GUIP_VM/edit?usp=sharing)
+[Presentación](https://docs.google.com/presentation/d/1dghraDSSganjvevvIs_mDBUbCdTH3SeG_InM2VdikxQ/edit?usp=sharing)
