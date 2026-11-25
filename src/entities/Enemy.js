@@ -19,9 +19,9 @@ export class Enemy {
         this.pathfinder = pathfinder;
         //sprite del enemigo
         this.sprite = scene.physics.add.sprite(x, y, 'enemy');
-        this.sprite.setDisplaySize(32, 32);
+        //this.sprite.setDisplaySize(32, 32);
         //se hace más pequeño para evitar atascarse
-        this.sprite.body.setSize(this.sprite.width * 0.8, this.sprite.height * 0.8);
+        this.sprite.body.setSize(25, 25);
         this.sprite.setImmovable(false);
         this.sprite.setCollideWorldBounds(true);
         
