@@ -7,7 +7,9 @@ export class RangedPlayer extends Player {
         
         //sprite del jugador
         this.sprite = scene.physics.add.sprite(x, y, 'rangePlayer');
-        this.sprite.setDisplaySize(32, 32);
+        //this.sprite.setDisplaySize(55, 39);
+        //tamaño de la hitbox
+        this.sprite.body.setSize(32, 32);
         this.sprite.setImmovable(false);
         this.sprite.setCollideWorldBounds(true);
 

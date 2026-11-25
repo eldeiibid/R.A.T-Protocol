@@ -36,10 +36,12 @@ export class GameScene extends Phaser.Scene {
         this.load.image('inventory', 'assets/images/inventory.png');
         this.load.image('redPistol', 'assets/images/redPistol.png');
         this.load.image('blueBat', 'assets/images/blueBat.png');
+        this.load.image('meleeHit', 'assets/images/meleeHit.png');
+
 
 
         //PLACEHOLDER assets
-        this.load.image('PLACEHOLDERIMG', 'assets/images/thehi.jpg');
+        this.load.image('bullet', 'assets/images/bullet.png');
         this.load.image('medkit', 'assets/images/tileMedkit.png');
         this.load.image('armor', 'assets/images/tileArmor.png');
         this.load.image('lever', 'assets/images/tileLever.png');

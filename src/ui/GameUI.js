@@ -64,15 +64,15 @@ export class GameUI {
         this.P2ArmourBar.setOrigin(1, 0.5);
 
         this.P1Name = this.scene.add.text(
-            20, 42,
+            20, 45,
             'P1',
-            {color: 'red'}
+            {color: 'lightblue'}
         );
 
         this.P2Name = this.scene.add.text(
-            580, 42,
+            580, 45,
             'P2',
-            {color: 'blue'}
+            {color: 'red'}
         );
 
         this.P1State = this.scene.add.text(

@@ -5,7 +5,7 @@ export class projectileHitBox extends damageHitBox{
         super(scene, origin, 2000);
 
         this.speed = 600;
-        this.sprite = scene.physics.add.sprite(origin.sprite.x, origin.sprite.y, 'PLACEHOLDERIMG');
+        this.sprite = scene.physics.add.sprite(origin.sprite.x, origin.sprite.y, 'bullet');
         this.sprite.setDisplaySize(12, 12);
         this.sprite.setCollideWorldBounds(false);
         

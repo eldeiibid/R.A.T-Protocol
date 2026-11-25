@@ -3,7 +3,7 @@ export class Enemy {
 
     constructor (scene, id, x, y, pathfinder) {
         this.health = 100;
-        this.speed = 100;
+        this.speed = 125;
         this.id = id;
 
         this.detectionRange = 200; //px
@@ -156,7 +156,7 @@ export class Enemy {
 
     //flasheo al recibir daño
     flashDamage(duration = 100) {
-        this.sprite.setTintFill(0xcc0000); //rojo
+        this.sprite.setTint(0xff0000); //rojo
 
         // Si recibe otro golpe durante el flasheo, reiniciar temporizador
         if (this.flashTimer) this.flashTimer.remove(false);

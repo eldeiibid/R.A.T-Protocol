@@ -7,7 +7,10 @@ export class MeleePlayer extends Player {
 
         //sprite del jugador
         this.sprite = scene.physics.add.sprite(x, y, 'meleePlayer');
-        this.sprite.setDisplaySize(32, 32);
+        //this.sprite.setDisplaySize(27, 33);
+        //tamaño de la hitbox
+        this.sprite.body.setSize(32, 32);
+        this.sprite.setImmovable(false);
         this.sprite.setImmovable(false);
         this.sprite.setCollideWorldBounds(true);
 

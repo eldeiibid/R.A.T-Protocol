@@ -6,7 +6,7 @@ export class PauseScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.rectangle(400, 300, 800, 600, 0x000000, 0.7);
+        this.add.rectangle(400, 300, 800, 600, 0x000000, 0.8);
 
         this.add.text(400, 200, 'Game Paused', { fontSize: '64px' }).setOrigin(0.5);
 

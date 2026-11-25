@@ -6,11 +6,11 @@ export class GuideScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.rectangle(400, 300, 800, 600, 0x000000, 0.7);
+        this.add.rectangle(400, 300, 800, 600, 0x000000, 1);
 
         this.add.text(400, 100, 'How to play', { fontSize: '64px' }).setOrigin(0.5);
 
-        this.add.text(200, 150, 'PLAYER 1:\nDirection arrows - move.\nLeft click - shoot\nMiddle click - reload\nNumpad 0 - interact\nCtrl - heal self\nShift - heal friend/stabilize', { fontSize: '16px'})
+        this.add.text(200, 150, 'PLAYER 1:\nDirection arrows - move.\nLeft click - shoot\nMiddle click - reload\nNumpad 0 - interact\nCtrl - heal self\nShift - heal friend/stabilize', { fontSize: '16px', color: '#8800ea'})
             .setOrigin(0.5, 0);
         this.add.text(600, 150, 'PLAYER 2:\nWASD - move.\nYGHJ - attack\n\nSpace - interact\nQ - heal self\nF - heal friend/stabilize', { fontSize: '16px'})
             .setOrigin(0.5, 0);
