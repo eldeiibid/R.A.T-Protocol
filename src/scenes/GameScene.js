@@ -37,8 +37,6 @@ export class GameScene extends Phaser.Scene {
         this.load.image('redBat', 'assets/images/redBat.png');
         this.load.image('bluePistol', 'assets/images/bluePistol.png');
         this.load.image('meleeHit', 'assets/images/meleeHit.png');
-        this.load.image('medkit', 'assets/images/itemMedkit.png');
-        this.load.image('armor', 'assets/images/itemArmor.png');
         this.load.image('lever', 'assets/images/tileLeverOn.png')
         this.load.image('rangeHeal', 'assets/images/Fox/curarsefo.png');
         this.load.image('rangeInteract', 'assets/images/Fox/interactuarfo.png');
@@ -48,9 +46,9 @@ export class GameScene extends Phaser.Scene {
 
 
         //PLACEHOLDER assets
-        this.load.image('bullet', 'assets/images/otherBullet.png');
-        //this.load.image('medkit', 'assets/images/tileMedkit.png');
-        //this.load.image('armor', 'assets/images/tileArmor.png');
+        this.load.image('bullet', 'assets/images/bullet.png');
+        this.load.image('medkit', 'assets/images/tileMedkit.png');
+        this.load.image('armor', 'assets/images/tileArmor.png');
         //this.load.image('lever', 'assets/images/tileLever.png');
 
         // Load Tile map from file
