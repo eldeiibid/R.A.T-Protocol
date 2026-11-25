@@ -10,12 +10,12 @@ export class CreditScene extends Phaser.Scene {
             fontSize: '64px',
             color: '#ffffff'
         }).setOrigin(0.5);
-        this.add.text(400, 250, 'Diseño, programación y mapmaking:\nALEJANDRO CUAXILOA DEL CAMPO y DAVID BENÍTEZ VÁZQUEZ ', {
+        this.add.text(400, 250, 'Design, programming and mapmaking:\nALEJANDRO CUAXILOA DEL CAMPO & DAVID BENÍTEZ VÁZQUEZ ', {
             fontSize: '20px',
             color: '#ffffff',
             align: 'center'
         }).setOrigin(0.5);
-        this.add.text(400, 325, 'Arte, audio y musica:\n DANIEL BORGES CANO y JAVIER BORRIÑO CARNERERO ', {
+        this.add.text(400, 325, 'Art, audio and music:\n DANIEL BORGES CANO & JAVIER BORRIÑO CARNERERO ', {
             fontSize: '20px',
             color: '#ffffff',
             align: 'center'

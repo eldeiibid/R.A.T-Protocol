@@ -34,6 +34,9 @@ export class GameScene extends Phaser.Scene {
         this.load.image('enemy', 'assets/images/enemy.png');
         this.load.image('tiles', 'assets/images/tilemap.png');
         this.load.image('inventory', 'assets/images/inventory.png');
+        this.load.image('redPistol', 'assets/images/redPistol.png');
+        this.load.image('blueBat', 'assets/images/blueBat.png');
+
 
         //PLACEHOLDER assets
         this.load.image('PLACEHOLDERIMG', 'assets/images/thehi.jpg');
@@ -286,8 +289,7 @@ export class GameScene extends Phaser.Scene {
         // actualiza UI
         this.gameUI.update();
 
-        //testeo de cambio de niveles
-        //if (this.enemies.length < 1) this.loadNextLevel();
+        //testeo de estado de derrota
         this.checkGameOver();
     }
 
@@ -313,7 +315,7 @@ export class GameScene extends Phaser.Scene {
     //Condición de derrota
     checkGameOver() {
         if (this.player1.lifeState !== 'Alive' && this.player2.lifeState !== 'Alive') 
-            this.loadScene('MenuScene', 2000, 200); //1: nombre de la escena, 2: tiempo de transición 3,4,5: nivel de color RGB de transición
+            this.loadScene('GameOverScene', 2000, 200); //1: nombre de la escena, 2: tiempo de transición 3,4,5: nivel de color RGB de transición
     }
     
     //refactorizar para: recibir una variable q indique si cargar un nivel o escena, tiempo de fadeout
@@ -334,7 +336,7 @@ export class GameScene extends Phaser.Scene {
         this.cameras.main.once('camerafadeoutcomplete', () => {
             if (next >= LEVELS.length) {
                 //si no quedan niveles, se vuelve a la escena principal (o la de creditos)
-                this.scene.start('MenuScene');
+                this.scene.start('VictoryScene');
             }
             else this.scene.restart({ levelIndex: next, playerState });
         });
@@ -342,8 +344,8 @@ export class GameScene extends Phaser.Scene {
 
     //lamar a cualquier otra escena (útil para la pantalla de gameOver o victoria)
     loadScene(sceneName, transitionTime, R, G, B) {
-        if (this.onAnimation) return; //para evitar llamar a la funcion varias veces
-        this.onAnimation = true;
+        if (this.changingLevel) return; //para evitar llamar a la funcion varias veces
+        this.changingLevel = true;
 
         this.cameras.main.fadeOut(transitionTime, R, G, B);
         this.cameras.main.once('camerafadeoutcomplete', () => {

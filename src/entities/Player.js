@@ -4,7 +4,7 @@ export class Player {
 
     constructor(scene, id, controls) {
         this.health = 100;
-        this.armour = 0;
+        this.armour = 100;
         this.maxArmour = 100;
         this.wounds = 4;
         this.items = [null, null, null, null, null];
